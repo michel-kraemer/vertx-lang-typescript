@@ -1,0 +1,60 @@
+plugins {
+    id 'com.moowork.node' version '0.10'
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots'
+    }
+}
+
+dependencies {
+    compile 'io.vertx:vertx-core:3.0.0-milestone5'
+    compile 'io.vertx:vertx-lang-js:3.0.0-milestone5'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.4'
+}
+
+node {
+  version = '0.12.4'
+  npmVersion = '2.1.6'
+  download = true
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDir 'node_modules'
+        }
+    }
+}
+
+/*eclipse {
+    classpath {
+        file {
+            whenMerged { classpath ->
+                if (!classpath.entries.any(it.path == 'node_modules')) {
+                    classpath.entries << new org.gradle.plugins.ide.eclipse.model.SourceFolder('node_modules', null)
+                }
+            }
+        }
+    }
+}*/
+
+/*eclipse {
+    classpath {
+        file {
+            withXml {
+                it.asNode().appendNode('classpathentry', [kind: 'src', path: 'node_modules'])
+            }
+        }
+    }
+}*/
+
+eclipseClasspath.dependsOn(npmInstall)
