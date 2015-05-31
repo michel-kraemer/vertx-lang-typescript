@@ -99,13 +99,23 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
 
     @Override
     public void start(Future<Void> startFuture) throws Exception {
-      ClassLoader cl = Thread.currentThread().getContextClassLoader();
-      Thread.currentThread().setContextClassLoader(new TypeScriptClassLoader(cl, getEngine()));
-      try {
-        delegateVerticle.start(startFuture);
-      } finally {
-        Thread.currentThread().setContextClassLoader(cl);
-      }
+      delegateVerticle.getVertx().executeBlocking((Future<Void> future) -> {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(new TypeScriptClassLoader(cl, getEngine()));
+        try {
+          delegateVerticle.start(future);
+        } catch (Exception e) {
+          future.fail(e);
+        } finally {
+          Thread.currentThread().setContextClassLoader(cl);
+        }
+      }, res -> {
+        if (res.succeeded()) {
+          startFuture.complete();
+        } else {
+          startFuture.fail(res.cause());
+        }
+      });
     }
 
     @Override
