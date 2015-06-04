@@ -7,10 +7,12 @@ import io.vertx.core.Vertx;
 import io.vertx.core.spi.VerticleFactory;
 import io.vertx.lang.js.JSVerticleFactory;
 import io.vertx.lang.typescript.cache.Cache;
+import io.vertx.lang.typescript.cache.DiskCache;
 import io.vertx.lang.typescript.cache.InMemoryCache;
 import io.vertx.lang.typescript.cache.NoopCache;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -22,17 +24,22 @@ import javax.script.ScriptException;
 
 public class TypeScriptVerticleFactory implements VerticleFactory {
   public static final String PROP_NAME_CACHE = "vertx.typescriptCache";
+  public static final String PROP_NAME_CACHE_DIR = "vertx.typescriptCacheDir";
   public static final String CACHE_NONE = "none";
   public static final String CACHE_MEMORY = "memory";
   public static final String CACHE_DISK = "disk";
+  public static final String DEFAULT_CACHE_DIR = "typescript_code_cache";
   
   private static final String CACHE_MODE = System.getProperty(PROP_NAME_CACHE, CACHE_NONE);
+  private static final String CACHE_DIR = System.getProperty(PROP_NAME_CACHE_DIR, DEFAULT_CACHE_DIR);
   private static final Cache CACHE;
   static {
     if (CACHE_MODE.equalsIgnoreCase(CACHE_NONE)) {
       CACHE = new NoopCache();
     } else if (CACHE_MODE.equalsIgnoreCase(CACHE_MEMORY)) {
       CACHE = new InMemoryCache();
+    } else if (CACHE_MODE.equalsIgnoreCase(CACHE_DISK)) {
+      CACHE = new DiskCache(new File(CACHE_DIR));
     } else {
       throw new RuntimeException("Illegal value for " + PROP_NAME_CACHE + ": " + CACHE_MODE);
     }

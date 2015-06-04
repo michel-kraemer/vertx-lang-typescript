@@ -4,5 +4,6 @@
 bin/
 build/
 node_modules/
+typescript_code_cache/
 .classpath
 .project

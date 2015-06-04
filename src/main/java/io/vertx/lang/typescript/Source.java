@@ -8,10 +8,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 public class Source {
   private final String filename;
   private final String contents;
+  private String digest;
   
   private Source(String filename, String contents) {
     this.filename = filename;
@@ -38,6 +43,21 @@ public class Source {
   
   public String getFilename() {
     return filename;
+  }
+  
+  public String getDigest() {
+    if (digest == null) {
+      MessageDigest md;
+      try {
+        md = MessageDigest.getInstance("SHA-1");
+      } catch (NoSuchAlgorithmException e) {
+        throw new RuntimeException(e);
+      }
+      
+      byte[] digestBytes = md.digest(contents.getBytes(StandardCharsets.UTF_8));
+      digest = Base64.getUrlEncoder().encodeToString(digestBytes);
+    }
+    return digest;
   }
   
   @Override
