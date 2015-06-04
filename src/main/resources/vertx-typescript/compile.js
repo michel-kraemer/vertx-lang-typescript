@@ -24,22 +24,15 @@ function compileTypescript(file) {
     },
 
     getSourceFile: function(filename, languageVersion, onError) {
-      var input = __parentClassLoader.getResourceAsStream(filename);
-      if (!input) {
-        input = new java.io.File(filename);
-      }
-
       var body;
-      var scanner = new java.util.Scanner(input);
       try {
-        body = scanner.useDelimiter("\\A").next();
+        var input = __typeScriptClassLoader.getSource(filename);
+        body = input.toString();
       } catch (e) {
         if (onError) {
           onError(e.message);
         }
         body = "";
-      } finally {
-        scanner.close();
       }
 
       return ts.createSourceFile(filename, body, opts.target, '0');

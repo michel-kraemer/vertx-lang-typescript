@@ -6,7 +6,11 @@ import io.vertx.core.Verticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.spi.VerticleFactory;
 import io.vertx.lang.js.JSVerticleFactory;
+import io.vertx.lang.typescript.cache.Cache;
+import io.vertx.lang.typescript.cache.InMemoryCache;
+import io.vertx.lang.typescript.cache.NoopCache;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -17,6 +21,23 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 public class TypeScriptVerticleFactory implements VerticleFactory {
+  public static final String PROP_NAME_CACHE = "vertx.typescriptCache";
+  public static final String CACHE_NONE = "none";
+  public static final String CACHE_MEMORY = "memory";
+  public static final String CACHE_DISK = "disk";
+  
+  private static final String CACHE_MODE = System.getProperty(PROP_NAME_CACHE, CACHE_NONE);
+  private static final Cache CACHE;
+  static {
+    if (CACHE_MODE.equalsIgnoreCase(CACHE_NONE)) {
+      CACHE = new NoopCache();
+    } else if (CACHE_MODE.equalsIgnoreCase(CACHE_MEMORY)) {
+      CACHE = new InMemoryCache();
+    } else {
+      throw new RuntimeException("Illegal value for " + PROP_NAME_CACHE + ": " + CACHE_MODE);
+    }
+  }
+  
   private static final String TYPESCRIPT_JS = "typescript/bin/typescriptServices.js";
   private static final String COMPILE_JS = "vertx-typescript/compile.js";
   
@@ -73,7 +94,8 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
       throw new IllegalStateException("Cannot find " + name + " on classpath");
     }
 
-    try (Reader r = new InputStreamReader(typeScriptCompilerUrl.openStream(), "UTF-8")) {
+    try (Reader r = new BufferedReader(new InputStreamReader(
+        typeScriptCompilerUrl.openStream(), "UTF-8"))) {
       engine.eval(r);
     } catch (ScriptException | IOException e) {
       throw new IllegalStateException("Could not evaluate " + name, e);
@@ -101,7 +123,8 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
     public void start(Future<Void> startFuture) throws Exception {
       delegateVerticle.getVertx().executeBlocking((Future<Void> future) -> {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(new TypeScriptClassLoader(cl, getEngine()));
+        Thread.currentThread().setContextClassLoader(new TypeScriptClassLoader(
+            cl, getEngine(), CACHE));
         try {
           delegateVerticle.start(future);
         } catch (Exception e) {
