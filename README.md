@@ -25,6 +25,48 @@ vertx.createHttpServer().requestHandler(req => {
 }).listen(8080);
 ```
 
+Improve performance
+-------------------
+
+The TypeScript compiler runs rather slow in the JVM using the Nashorn JavaScript
+engine. It takes a couple of cycles before the compiler reaches its full speed.
+For this reason, the library offers a number of parameters to tweak the
+performance.
+
+### Make use of Node.js
+
+The TypeScript compiler runs a lot faster in [Node.js](https://nodejs.org/).
+If the `node` executable is in the path the library automatically makes use of it.
+
+### Cache compiled scripts in memory
+
+If you are compiling a script multiple times in the same Vert.x container you
+should set the `vertx.typescriptCache` system property to `memory`. This allows
+vertx-lang-typescript to reuse already compiled scripts.
+
+On the command line you can set this property as follows:
+
+    export VERTX_OPTS=-Dvertx.typescriptCache=memory
+
+In your Java program you can use
+
+    System.setProperty("vertx.typescriptCache", "memory");
+
+### Cache compiled scripts on disk
+
+Caching scripts in memory only makes a difference if you, for example, deploy
+the same verticle multiple times. The ramp-up time, however, may still be
+rather long.
+
+To mitigate this you can cache compiled scripts on disk. Set the
+`vertx.typescriptCache` system property to `disk`.
+
+    export VERTX_OPTS=-Dvertx.typescriptCache=disk
+
+or
+
+    System.setProperty("vertx.typescriptCache", "disk");
+
 Building
 --------
 
