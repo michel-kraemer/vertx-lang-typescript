@@ -46,11 +46,15 @@ vertx-lang-typescript to reuse already compiled scripts.
 
 On the command line you can set this property as follows:
 
-    export VERTX_OPTS=-Dvertx.typescriptCache=memory
+```bash
+export VERTX_OPTS=-Dvertx.typescriptCache=memory
+```
 
 In your Java program you can use
 
-    System.setProperty("vertx.typescriptCache", "memory");
+```java
+System.setProperty("vertx.typescriptCache", "memory");
+```
 
 ### Cache compiled scripts on disk
 
@@ -61,29 +65,39 @@ rather long.
 To mitigate this you can cache compiled scripts on disk. Set the
 `vertx.typescriptCache` system property to `disk`.
 
-    export VERTX_OPTS=-Dvertx.typescriptCache=disk
+```bash
+export VERTX_OPTS=-Dvertx.typescriptCache=disk
+```
 
 or
 
-    System.setProperty("vertx.typescriptCache", "disk");
+```java
+System.setProperty("vertx.typescriptCache", "disk");
+```
 
 Cached scripts will be stored in a directory called `typescript_code_cache`
 in the current working directory by default. You can change this location
 by setting the `vertx.typescriptCacheDir` system property:
 
-    export VERTX_OPTS=-Dvertx.typescriptCache=disk -Dvertx.typescriptCacheDir=/tmp/typescript-cache
+```bash
+export VERTX_OPTS=-Dvertx.typescriptCache=disk -Dvertx.typescriptCacheDir=/tmp/typescript-cache
+```
 
 or
 
-    System.setProperty("vertx.typescriptCache", "disk");
-    System.setProperty("vertx.typescriptCacheDir", "/tmp/typescript-cache");
+```java
+System.setProperty("vertx.typescriptCache", "disk");
+System.setProperty("vertx.typescriptCacheDir", "/tmp/typescript-cache");
+```
 
 Building
 --------
 
 Perform a full build with
 
-    ./gradlew build
+```bash
+./gradlew build
+```
 
 Just as Vert.x 3.0 the library requires Java 8.
 
