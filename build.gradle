@@ -45,7 +45,6 @@ node {
 sourceSets {
     main {
         resources {
-            srcDir 'node_modules'
             srcDir 'src-gen/main/resources'
         }
     }
@@ -75,6 +74,11 @@ task copyTypeDefinitions(type: Copy, dependsOn: generateTypeDefinitions) {
     into new File(projectDir, 'src-gen/main/resources/vertx-typescript')
 }
 
-processResources.dependsOn(copyTypeDefinitions)
+task copyRequiredResources(type: Copy, dependsOn: [copyTypeDefinitions, npmInstall]) {
+    from file('node_modules/typescript')
+    into 'src-gen/main/resources/typescript'
+}
 
-eclipseClasspath.dependsOn(npmInstall)
+processResources.dependsOn(copyRequiredResources)
+
+eclipseClasspath.dependsOn(processResources)
