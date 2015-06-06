@@ -67,6 +67,17 @@ or
 
     System.setProperty("vertx.typescriptCache", "disk");
 
+Cached scripts will be stored in a directory called `typescript_code_cache`
+in the current working directory by default. You can change this location
+by setting the `vertx.typescriptCacheDir` system property:
+
+    export VERTX_OPTS=-Dvertx.typescriptCache=disk -Dvertx.typescriptCacheDir=/tmp/typescript-cache
+
+or
+
+    System.setProperty("vertx.typescriptCache", "disk");
+    System.setProperty("vertx.typescriptCacheDir", "/tmp/typescript-cache");
+
 Building
 --------
 
