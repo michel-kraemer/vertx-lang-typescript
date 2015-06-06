@@ -1,6 +1,19 @@
+// Copyright 2015 Michel Kraemer
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package io.vertx.lang.typescript;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,38 +26,89 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
+/**
+ * Represents a source file
+ * @author Michel Kraemer
+ */
 public class Source {
+  /**
+   * The file's name
+   */
   private final String filename;
+  
+  /**
+   * The file's contents
+   */
   private final String contents;
+  
+  /**
+   * The SHA-1 digest of the file's contents
+   * @see #getDigest()
+   */
   private String digest;
   
+  /**
+   * Creates a new source object
+   * @param filename the file name
+   * @param contents the file contents
+   */
   private Source(String filename, String contents) {
     this.filename = filename;
     this.contents = contents;
   }
   
+  /**
+   * Creates a new source object from a URL
+   * @param url the URL to read
+   * @param cs the character set to use when reading
+   * @return the new source object
+   * @throws IOException if reading from the given URL failed
+   */
   public static Source fromURL(URL url, Charset cs) throws IOException {
     String filename = basename(url.getPath());
     try (InputStream is = url.openStream()) {
-      byte[] barr = readFully(is);
-      String source = new String(barr, cs);
-      return new Source(filename, source);
+      return fromStream(is, filename, cs);
     }
   }
   
+  /**
+   * Creates a new source object from a file
+   * @param f the file to read
+   * @param cs the character set to use when reading
+   * @return the new source object
+   * @throws IOException if reading from the given file failed
+   */
   public static Source fromFile(File f, Charset cs) throws IOException {
     String filename = f.getName();
     try (InputStream is = new FileInputStream(f)) {
-      byte[] barr = readFully(is);
-      String source = new String(barr, cs);
-      return new Source(filename, source);
+      return fromStream(is, filename, cs);
     }
   }
   
+  /**
+   * Creates a new source object from a stream. Does not close the given stream.
+   * @param is the input stream to read
+   * @param cs the character set to use when reading
+   * @return the new source object
+   * @throws IOException if reading from the given stream failed
+   */
+  public static Source fromStream(InputStream is, String filename, Charset cs) throws IOException {
+    byte[] barr = readFully(is);
+    String source = new String(barr, cs);
+    return new Source(filename, source);
+  }
+  
+  /**
+   * @return the file name
+   */
   public String getFilename() {
     return filename;
   }
   
+  /**
+   * Calculates the SHA-1 digest of the file's contents
+   * @return the digest
+   */
   public String getDigest() {
     if (digest == null) {
       MessageDigest md;
@@ -108,6 +172,11 @@ public class Source {
     return true;
   }
 
+  /**
+   * Gets the last element (i.e. the file name) from the given path
+   * @param str the path
+   * @return the last path element
+   */
   private static String basename(String str) {
     int sl = str.lastIndexOf('/');
     if (sl >= 0) {
@@ -116,11 +185,14 @@ public class Source {
     return str;
   }
   
+  /**
+   * Reads an input stream completely into a byte array. Does not close the
+   * given stream.
+   * @param is the input stream to read from
+   * @return the bytes read from the stream
+   * @throws IOException if reading failed
+   */
   private static byte[] readFully(InputStream is) throws IOException {
-    if (!(is instanceof BufferedInputStream)) {
-      is = new BufferedInputStream(is);
-    }
-    
     final byte[] buf = new byte[8192];
     try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
       int read;

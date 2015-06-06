@@ -1,3 +1,17 @@
+// Copyright 2015 Michel Kraemer
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package io.vertx.lang.typescript;
 
 import io.vertx.core.Context;
@@ -22,16 +36,56 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+/**
+ * A factory for verticles written in TypeScript
+ * @author Michel Kraemer
+ */
 public class TypeScriptVerticleFactory implements VerticleFactory {
+  /**
+   * The name of the system property specifying the type of cache to use
+   */
   public static final String PROP_NAME_CACHE = "vertx.typescriptCache";
+  
+  /**
+   * The name of the system property specifying the directory of the disk cache
+   * (default: {@value #DEFAULT_CACHE_DIR})
+   */
   public static final String PROP_NAME_CACHE_DIR = "vertx.typescriptCacheDir";
+  
+  /**
+   * Do not cache compiled sources (default)
+   */
   public static final String CACHE_NONE = "none";
+  
+  /**
+   * Cache compiled sources in memory
+   */
   public static final String CACHE_MEMORY = "memory";
+  
+  /**
+   * Cache compiled sources on disk (in the directory specified by the
+   * {@value #PROP_NAME_CACHE_DIR} system property
+   */
   public static final String CACHE_DISK = "disk";
+  
+  /**
+   * Default cache directory (relative to current working directory)
+   */
   public static final String DEFAULT_CACHE_DIR = "typescript_code_cache";
   
+  /**
+   * The cache mode
+   */
   private static final String CACHE_MODE = System.getProperty(PROP_NAME_CACHE, CACHE_NONE);
+  
+  /**
+   * The cache directory (only used if disk cache is enabled)
+   */
   private static final String CACHE_DIR = System.getProperty(PROP_NAME_CACHE_DIR, DEFAULT_CACHE_DIR);
+  
+  /**
+   * The actual code cache
+   */
   private static final Cache CACHE;
   static {
     if (CACHE_MODE.equalsIgnoreCase(CACHE_NONE)) {
@@ -45,10 +99,25 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
     }
   }
   
+  /**
+   * Path to the TypeScript compiler
+   */
   private static final String TYPESCRIPT_JS = "typescript/bin/typescriptServices.js";
+  
+  /**
+   * Path to a helper script calling the TypeScript compiler
+   */
   private static final String COMPILE_JS = "vertx-typescript/util/compile.js";
   
+  /**
+   * A factory for verticles written in JavaScript. Used to delegate compiled
+   * scripts to.
+   */
   private final VerticleFactory delegateFactory;
+  
+  /**
+   * A JavaScript engine hosting the TypeScript compiler
+   */
   private ScriptEngine engine;
   
   /**
@@ -74,6 +143,11 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
     return new TypeScriptVerticle(v);
   }
   
+  /**
+   * Creates the JavaScript engine that hosts the TypeScript compiler. Loads
+   * the compiler and a helper script and evaluates them within the engine.
+   * @return the engine
+   */
   private synchronized ScriptEngine getEngine() {
     if (engine != null) {
       return engine;
@@ -95,23 +169,36 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
     return engine;
   }
   
+  /**
+   * Loads a JavaScript file and evaluate it within {@link #engine}
+   * @param name the name of the file to load
+   */
   private void loadScript(String name) {
-    URL typeScriptCompilerUrl = getClass().getClassLoader().getResource(name);
-    if (typeScriptCompilerUrl == null) {
+    URL url = getClass().getClassLoader().getResource(name);
+    if (url == null) {
       throw new IllegalStateException("Cannot find " + name + " on classpath");
     }
 
-    try (Reader r = new BufferedReader(new InputStreamReader(
-        typeScriptCompilerUrl.openStream(), "UTF-8"))) {
+    try (Reader r = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"))) {
       engine.eval(r);
     } catch (ScriptException | IOException e) {
       throw new IllegalStateException("Could not evaluate " + name, e);
     }
   }
   
+  /**
+   * A verticle written in TypeScript
+   */
   public class TypeScriptVerticle implements Verticle {
+    /**
+     * The JavaScript verticle to delegate to
+     */
     private final Verticle delegateVerticle;
     
+    /**
+     * Creates a verticle
+     * @param delegateVerticle the JavaScript verticle to delegate to
+     */
     public TypeScriptVerticle(Verticle delegateVerticle) {
       this.delegateVerticle = delegateVerticle;
     }
@@ -128,10 +215,14 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
 
     @Override
     public void start(Future<Void> startFuture) throws Exception {
+      // compile TypeScript source when verticle is started
       delegateVerticle.getVertx().executeBlocking((Future<Void> future) -> {
+        // create a new class loader that automatically compiles sources
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(new TypeScriptClassLoader(
             cl, getEngine(), CACHE));
+        
+        // start the JavaScript verticle. this will trigger loading and compiling.
         try {
           delegateVerticle.start(future);
         } catch (Exception e) {
