@@ -4,6 +4,7 @@
 bin/
 build/
 node_modules/
+src-gen/
 typescript_code_cache/
 .classpath
 .project
