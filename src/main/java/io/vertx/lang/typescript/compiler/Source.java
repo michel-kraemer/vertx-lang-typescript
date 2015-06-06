@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package io.vertx.lang.typescript;
+package io.vertx.lang.typescript.compiler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -52,7 +52,7 @@ public class Source {
    * @param filename the file name
    * @param contents the file contents
    */
-  private Source(String filename, String contents) {
+  public Source(String filename, String contents) {
     this.filename = filename;
     this.contents = contents;
   }

@@ -12,22 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package io.vertx.lang.typescript.cache;
+package io.vertx.lang.typescript.compiler;
 
-import io.vertx.lang.typescript.compiler.Source;
+import java.io.IOException;
 
 /**
- * A dummy cache that never stores anything
+ * Loads source files
  * @author Michel Kraemer
  */
-public class NoopCache implements Cache {
-  @Override
-  public String get(Source src) {
-    return null;
-  }
-
-  @Override
-  public void put(Source src, String value) {
-    // do not cache
-  }
+public interface SourceFactory {
+  /**
+   * Loads a source file
+   * @param filename the name of the file to load
+   * @return the source object
+   * @throws IOException if the source file could not be loaded
+   */
+  Source getSource(String filename) throws IOException;
 }

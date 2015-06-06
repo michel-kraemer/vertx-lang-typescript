@@ -47,7 +47,7 @@ function compileTypescript(file) {
       // use TypeScriptClassLoader to load the given file
       var body;
       try {
-        var input = __typeScriptClassLoader.getSource(filename);
+        var input = __sourceFactory.getSource(filename);
         body = input.toString();
       } catch (e) {
         if (onError) {

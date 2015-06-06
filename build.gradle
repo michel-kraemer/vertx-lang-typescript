@@ -21,6 +21,8 @@ dependencies {
     compile 'io.vertx:vertx-core:3.0.0-milestone6'
     compile 'io.vertx:vertx-lang-js:3.0.0-milestone6'
 
+    testCompile 'junit:junit:4.12'
+
     core group: 'io.vertx', name: 'vertx-core', version: '3.0.0-milestone6', classifier: 'sources'
 
     codegen 'io.vertx:vertx-core:3.0.0-milestone6'

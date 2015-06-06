@@ -14,7 +14,7 @@
 
 package io.vertx.lang.typescript.cache;
 
-import io.vertx.lang.typescript.Source;
+import io.vertx.lang.typescript.compiler.Source;
 
 /**
  * A cache for already compiled sources

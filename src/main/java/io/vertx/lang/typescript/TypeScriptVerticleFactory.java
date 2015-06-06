@@ -24,17 +24,9 @@ import io.vertx.lang.typescript.cache.Cache;
 import io.vertx.lang.typescript.cache.DiskCache;
 import io.vertx.lang.typescript.cache.InMemoryCache;
 import io.vertx.lang.typescript.cache.NoopCache;
+import io.vertx.lang.typescript.compiler.EngineCompiler;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 
 /**
  * A factory for verticles written in TypeScript
@@ -100,25 +92,10 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
   }
   
   /**
-   * Path to the TypeScript compiler
-   */
-  private static final String TYPESCRIPT_JS = "typescript/bin/typescriptServices.js";
-  
-  /**
-   * Path to a helper script calling the TypeScript compiler
-   */
-  private static final String COMPILE_JS = "vertx-typescript/util/compile.js";
-  
-  /**
    * A factory for verticles written in JavaScript. Used to delegate compiled
    * scripts to.
    */
   private final VerticleFactory delegateFactory;
-  
-  /**
-   * A JavaScript engine hosting the TypeScript compiler
-   */
-  private ScriptEngine engine;
   
   /**
    * Default constructor
@@ -141,49 +118,6 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
   public Verticle createVerticle(String verticleName, ClassLoader classLoader) throws Exception {
     Verticle v = delegateFactory.createVerticle(verticleName, classLoader);
     return new TypeScriptVerticle(v);
-  }
-  
-  /**
-   * Creates the JavaScript engine that hosts the TypeScript compiler. Loads
-   * the compiler and a helper script and evaluates them within the engine.
-   * @return the engine
-   */
-  private synchronized ScriptEngine getEngine() {
-    if (engine != null) {
-      return engine;
-    }
-    
-    // create JavaScript engine
-    ScriptEngineManager mgr = new ScriptEngineManager();
-    engine = mgr.getEngineByName("nashorn");
-    if (engine == null) {
-      throw new IllegalStateException("Could not find Nashorn JavaScript engine.");
-    }
-    
-    // load TypeScript compiler
-    loadScript(TYPESCRIPT_JS);
-    
-    // load compile.js
-    loadScript(COMPILE_JS);
-    
-    return engine;
-  }
-  
-  /**
-   * Loads a JavaScript file and evaluate it within {@link #engine}
-   * @param name the name of the file to load
-   */
-  private void loadScript(String name) {
-    URL url = getClass().getClassLoader().getResource(name);
-    if (url == null) {
-      throw new IllegalStateException("Cannot find " + name + " on classpath");
-    }
-
-    try (Reader r = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"))) {
-      engine.eval(r);
-    } catch (ScriptException | IOException e) {
-      throw new IllegalStateException("Could not evaluate " + name, e);
-    }
   }
   
   /**
@@ -220,7 +154,7 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
         // create a new class loader that automatically compiles sources
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(new TypeScriptClassLoader(
-            cl, getEngine(), CACHE));
+            cl, new EngineCompiler(), CACHE));
         
         // start the JavaScript verticle. this will trigger loading and compiling.
         try {

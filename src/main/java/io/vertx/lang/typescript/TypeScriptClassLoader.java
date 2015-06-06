@@ -15,6 +15,9 @@
 package io.vertx.lang.typescript;
 
 import io.vertx.lang.typescript.cache.Cache;
+import io.vertx.lang.typescript.compiler.Source;
+import io.vertx.lang.typescript.compiler.SourceFactory;
+import io.vertx.lang.typescript.compiler.TypeScriptCompiler;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -25,17 +28,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
-import javax.script.SimpleBindings;
-
 /**
  * A special class loader that automatically compiles loaded TypeScript
  * sources to JavaScript.
  * @author Michel Kraemer
  */
-public class TypeScriptClassLoader extends ClassLoader {
+public class TypeScriptClassLoader extends ClassLoader implements SourceFactory {
   /**
    * A cache for already loaded source files
    */
@@ -47,19 +45,19 @@ public class TypeScriptClassLoader extends ClassLoader {
   private final Cache codeCache;
   
   /**
-   * The JavaScript engine hosting the TypeScript compiler
+   * A TypeScript compiler
    */
-  private final ScriptEngine engine;
+  private final TypeScriptCompiler compiler;
   
   /**
    * Creates a new class loader
    * @param parent the parent class loader
-   * @param engine the JavaScript engine hosting the TypeScript compiler
+   * @param compiler a TypeScript compiler
    * @param codeCache a cache for already compiled sources
    */
-  public TypeScriptClassLoader(ClassLoader parent, ScriptEngine engine, Cache codeCache) {
+  public TypeScriptClassLoader(ClassLoader parent, TypeScriptCompiler compiler, Cache codeCache) {
     super(parent);
-    this.engine = engine;
+    this.compiler = compiler;
     this.codeCache = codeCache;
   }
   
@@ -125,25 +123,10 @@ public class TypeScriptClassLoader extends ClassLoader {
     String code = codeCache.get(src);
     if (code == null) {
       // compile it now
-      code = compile(name);
+      code = compiler.compile(name, this);
       codeCache.put(src, code);
     }
     
     return new ByteArrayInputStream(code.getBytes(StandardCharsets.UTF_8));
-  }
-  
-  /**
-   * Compiles a file with the given name
-   * @param name the file name
-   * @return the compiled source
-   */
-  private String compile(String name) {
-    try {
-      SimpleBindings bindings = new SimpleBindings(engine.getBindings(ScriptContext.ENGINE_SCOPE));
-      bindings.put("__typeScriptClassLoader", this);
-      return (String)engine.eval("compileTypescript('" + name + "');", bindings);
-    } catch (ScriptException e) {
-      throw new IllegalStateException("Could not compile \"" + name + "\"", e);
-    }
   }
 }
