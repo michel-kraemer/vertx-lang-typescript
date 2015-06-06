@@ -25,6 +25,8 @@ import io.vertx.lang.typescript.cache.DiskCache;
 import io.vertx.lang.typescript.cache.InMemoryCache;
 import io.vertx.lang.typescript.cache.NoopCache;
 import io.vertx.lang.typescript.compiler.EngineCompiler;
+import io.vertx.lang.typescript.compiler.NodeCompiler;
+import io.vertx.lang.typescript.compiler.TypeScriptCompiler;
 
 import java.io.File;
 
@@ -98,6 +100,11 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
   private final VerticleFactory delegateFactory;
   
   /**
+   * The actual TypeScript compiler
+   */
+  private TypeScriptCompiler compiler;
+  
+  /**
    * Default constructor
    */
   public TypeScriptVerticleFactory() {
@@ -118,6 +125,20 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
   public Verticle createVerticle(String verticleName, ClassLoader classLoader) throws Exception {
     Verticle v = delegateFactory.createVerticle(verticleName, classLoader);
     return new TypeScriptVerticle(v);
+  }
+  
+  /**
+   * @return the best available TypeScript compiler
+   */
+  private TypeScriptCompiler getTypeScriptCompiler() {
+    if (compiler == null) {
+      if (NodeCompiler.supportsNode()) {
+        compiler = new NodeCompiler();
+      } else {
+        compiler = new EngineCompiler();
+      }
+    }
+    return compiler;
   }
   
   /**
@@ -154,7 +175,7 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
         // create a new class loader that automatically compiles sources
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(new TypeScriptClassLoader(
-            cl, new EngineCompiler(), CACHE));
+            cl, getTypeScriptCompiler(), CACHE));
         
         // start the JavaScript verticle. this will trigger loading and compiling.
         try {

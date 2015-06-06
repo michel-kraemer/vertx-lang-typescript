@@ -15,11 +15,11 @@
 package io.vertx.lang.typescript.compiler;
 
 /**
- * Tests the {@link EngineCompiler}
+ * Tests the {@link NodeCompiler}
  * @author Michel Kraemer
  */
-public class EngineCompilerTest extends CompilerTestBase {
-  private EngineCompiler compiler = new EngineCompiler();
+public class NodeCompilerTest extends CompilerTestBase {
+  private NodeCompiler compiler = new NodeCompiler();
 
   @Override
   protected TypeScriptCompiler getCompiler() {
