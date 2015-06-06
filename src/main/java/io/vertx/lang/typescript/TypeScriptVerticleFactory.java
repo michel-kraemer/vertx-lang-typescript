@@ -46,7 +46,7 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
   }
   
   private static final String TYPESCRIPT_JS = "typescript/bin/typescriptServices.js";
-  private static final String COMPILE_JS = "vertx-typescript/compile.js";
+  private static final String COMPILE_JS = "vertx-typescript/util/compile.js";
   
   private final VerticleFactory delegateFactory;
   private ScriptEngine engine;

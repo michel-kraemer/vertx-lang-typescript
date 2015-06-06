@@ -29,8 +29,9 @@ function compileTypescript(file) {
         var input = __typeScriptClassLoader.getSource(filename);
         body = input.toString();
       } catch (e) {
+        java.lang.System.out.println(JSON.stringify(ts.Diagnostics));
         if (onError) {
-          onError(e.message);
+          onError(e.getMessage() || "Unknown error");
         }
         body = "";
       }

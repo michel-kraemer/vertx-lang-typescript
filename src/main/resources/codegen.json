@@ -1,0 +1,8 @@
+{
+  "name": "JavaScript",
+  "generators": [ {
+    "kind": "class",
+    "fileName": "'resources/' + type.raw.moduleName + '-typescript/' + helper.convertCamelCaseToUnderscores(type.raw.simpleName) + '.d.ts'",
+    "templateFileName": "vertx-typescript/template/ts.templ"
+  } ]
+}

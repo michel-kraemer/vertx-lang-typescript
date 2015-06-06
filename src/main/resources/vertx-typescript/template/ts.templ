@@ -1,0 +1,113 @@
+@includeNamed{'/vertx-java/template/common-lib.templ'}
+
+@code{
+  def renderLinkToHtml(link) {
+    return null;
+  }
+}
+
+@comment{"Generate the module name of a type"}
+@comment{"=================================="}
+
+@code{
+  def genModuleName(moduleType) {
+    return helper.convertCamelCaseToUnderscores(moduleType.raw.simpleName) + '.d.ts';
+  }
+}
+
+@comment{"Generate the TypeScript type of a type"}
+@comment{"======================================"}
+
+@code{
+  def genTSType(type) {
+    if (type.kind == CLASS_STRING) {
+      return 'string';
+    } else if (type.kind == CLASS_PRIMITIVE || type.kind == CLASS_BOXED_PRIMITIVE) {
+      if (type.simpleName == 'boolean' || type.simpleName == 'Boolean') {
+        return 'boolean';
+      } else if (type.simpleName == 'char' || type.simpleName == 'Character') {
+        return 'string';
+      } else {
+        return 'number';
+      }
+    } else if (type.kind == CLASS_JSON_OBJECT) {
+      return '{ [key: string]: any }';
+    } else if (type.kind == CLASS_DATA_OBJECT) {
+      return '{ [key: string]: any }';
+    } else if (type.kind == CLASS_JSON_ARRAY) {
+      return '[]';
+    } else if (type.kind == CLASS_ENUM) {
+      return 'any';
+    } else if (type.kind == CLASS_API) {
+      return type.raw.simpleName;
+    } else if (type.kind.collection) {
+      return 'Array<' + genTSType(type.args[0]) + '>';
+    } else if (type.kind == CLASS_MAP) {
+      return '{ [key: string]: ' + genTSType(type.args[1]) + ' }';
+    } else if (type.kind == CLASS_OBJECT) {
+      return 'any';
+    } else if (type.kind == CLASS_HANDLER) {
+      if (type.args[0].kind == CLASS_VOID) {
+        return '() => void';
+      } else if (type.args[0].kind == CLASS_ASYNC_RESULT) {
+        return '(res: ' + genTSType(type.args[0].args[0]) + ', err?: Throwable) => void';
+      } else {
+        return '(e: ' + genTSType(type.args[0]) + ') => void';
+      }
+    } else if (type.name.equals('void') || type.kind == CLASS_VOID) {
+      return 'void';
+    } else {
+      return type.raw.simpleName;
+    }
+  }
+}
+
+@comment{"Generate a method"}
+@comment{"================="}
+
+@declare{'genMethod'} 
+  @if{method.staticMethod == static}
+  @if{method.doc != null}
+  /**
+  @{renderDocToHtml(" *", method.doc, renderLinkToHtml)}
+   */@end{}
+  @{method.name}(@foreach{param: method.params}@{param.name}: @{genTSType(param.type)}@end{", "}): @{genTSType(method.returnType)};
+  @end{}
+@end{}
+
+@comment{"Generate interface"}
+@comment{"=================="}
+
+/// <reference path="throwable.d.ts" />
+@foreach{referencedType : referencedTypes}
+/// <reference path="@{genModuleName(referencedType)}" />
+@end{}
+
+@if{doc != null}
+/**
+@{renderDocToHtml(" *", doc, renderLinkToHtml)}
+ */@end{}
+interface @{ifaceSimpleName} {
+  @foreach{method:methods}
+    @includeNamed{'genMethod';static=false}
+  @end{}
+}
+
+@comment{"Check if there are static methods"}
+@code{hasStaticMethods = false}
+@foreach{method:methods}
+  @if{method.staticMethod}@code{hasStaticMethods = true}@end{}
+@end{}
+
+@if{hasStaticMethods}
+declare var @{ifaceSimpleName}: {
+  new(): @{ifaceSimpleName};
+  @foreach{method:methods}
+    @includeNamed{'genMethod';static=true}
+  @end{}
+}
+@end{}
+
+@if{ifaceSimpleName == 'Vertx'}
+declare var vertx: Vertx;
+@end{}

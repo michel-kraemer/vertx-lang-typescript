@@ -10,7 +10,7 @@ public class TestRun {
         System.out.println("Deploying test took " + (System.currentTimeMillis() - start) + "ms");
         long start2 = System.currentTimeMillis();
         vertx.deployVerticle("test2.ts", ar2 -> {
-          if (ar.succeeded()) {
+          if (ar2.succeeded()) {
             System.out.println("Deploying test2 took " + (System.currentTimeMillis() - start2) + "ms");
             if (i > 0) {
               deploy(vertx, i - 1);

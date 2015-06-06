@@ -12,9 +12,22 @@ repositories {
     }
 }
 
+configurations {
+    core
+    codegen
+}
+
 dependencies {
-    compile 'io.vertx:vertx-core:3.0.0-milestone5'
-    compile 'io.vertx:vertx-lang-js:3.0.0-milestone5'
+    compile 'io.vertx:vertx-core:3.0.0-milestone6'
+    compile 'io.vertx:vertx-lang-js:3.0.0-milestone6'
+
+    core group: 'io.vertx', name: 'vertx-core', version: '3.0.0-milestone6', classifier: 'sources'
+
+    codegen 'io.vertx:vertx-core:3.0.0-milestone6'
+    codegen 'io.vertx:vertx-codegen:3.0.0-milestone6'
+    codegen 'io.vertx:vertx-docgen:3.0.0-milestone6'
+    codegen 'log4j:log4j:1.2.16'
+    codegen 'org.slf4j:slf4j-api:1.6.2'
 }
 
 task wrapper(type: Wrapper) {
@@ -31,30 +44,35 @@ sourceSets {
     main {
         resources {
             srcDir 'node_modules'
+            srcDir 'src-gen/main/resources'
         }
     }
 }
 
-/*eclipse {
-    classpath {
-        file {
-            whenMerged { classpath ->
-                if (!classpath.entries.any(it.path == 'node_modules')) {
-                    classpath.entries << new org.gradle.plugins.ide.eclipse.model.SourceFolder('node_modules', null)
-                }
-            }
-        }
+task copyCore(type: Copy) {
+    from {
+        configurations.core.collect { zipTree(it) }
     }
-}*/
+    into new File(buildDir, 'core')
+    include "io/vertx/core/**"
+}
 
-/*eclipse {
-    classpath {
-        file {
-            withXml {
-                it.asNode().appendNode('classpathentry', [kind: 'src', path: 'node_modules'])
-            }
-        }
-    }
-}*/
+task generateTypeDefinitions(type: JavaCompile, dependsOn: copyCore) {
+    source = new File(buildDir, 'core')
+    classpath = configurations.codegen + files(sourceSets.main.resources.srcDirs)
+    options.compilerArgs = [
+            '-proc:only',
+            '-processor', 'io.vertx.codegen.CodeGenProcessor',
+            '-AoutputDirectory=' + new File(buildDir, 'generated'),
+    ]
+    destinationDir = new File(buildDir, 'generated')
+}
+
+task copyTypeDefinitions(type: Copy, dependsOn: generateTypeDefinitions) {
+    from new File(generateTypeDefinitions.destinationDir, 'resources/vertx-typescript')
+    into new File(projectDir, 'src-gen/main/resources/vertx-typescript')
+}
+
+processResources.dependsOn(copyTypeDefinitions)
 
 eclipseClasspath.dependsOn(npmInstall)
