@@ -12,28 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package io.vertx.lang.typescript.cache;
+package de.undercouch.vertx.lang.typescript.compiler;
 
-import io.vertx.lang.typescript.compiler.Source;
-
-import java.util.HashMap;
-import java.util.Map;
+import de.undercouch.vertx.lang.typescript.compiler.EngineCompiler;
+import de.undercouch.vertx.lang.typescript.compiler.TypeScriptCompiler;
 
 /**
- * A cache keeping compiled code in memory
+ * Tests the {@link EngineCompiler}
  * @author Michel Kraemer
  */
-public class InMemoryCache implements Cache {
-  // TODO use soft keys
-  private Map<Source, String> cache = new HashMap<>();
-  
-  @Override
-  public String get(Source src) {
-    return cache.get(src);
-  }
+public class EngineCompilerTest extends CompilerTestBase {
+  private EngineCompiler compiler = new EngineCompiler();
 
   @Override
-  public void put(Source src, String value) {
-    cache.put(src, value);
+  protected TypeScriptCompiler getCompiler() {
+    return compiler;
   }
 }

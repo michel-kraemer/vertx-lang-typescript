@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package io.vertx.lang.typescript.cache;
-
-import io.vertx.lang.typescript.compiler.Source;
+package de.undercouch.vertx.lang.typescript.cache;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -23,6 +21,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+
+import de.undercouch.vertx.lang.typescript.compiler.Source;
 
 /**
  * A cache storing compiled code on disk

@@ -12,21 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package io.vertx.lang.typescript.compiler;
+package de.undercouch.vertx.lang.typescript.cache;
 
-import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import de.undercouch.vertx.lang.typescript.compiler.Source;
 
 /**
- * Compiles TypeScript source files
+ * A cache keeping compiled code in memory
  * @author Michel Kraemer
  */
-public interface TypeScriptCompiler {
-  /**
-   * Compiles the given TypeScript file
-   * @param filename the name of the file to compile
-   * @param sourceFactory the factory that loads source files
-   * @return the generated code
-   * @throws IOException if one of the source files to compile could not be loaded
-   */
-  String compile(String filename, SourceFactory sourceFactory) throws IOException;
+public class InMemoryCache implements Cache {
+  // TODO use soft keys
+  private Map<Source, String> cache = new HashMap<>();
+  
+  @Override
+  public String get(Source src) {
+    return cache.get(src);
+  }
+
+  @Override
+  public void put(Source src, String value) {
+    cache.put(src, value);
+  }
 }

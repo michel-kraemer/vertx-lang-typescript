@@ -1,4 +1,4 @@
-package io.vertx.lang.typescript;
+package de.undercouch.vertx.lang.typescript;
 
 import io.vertx.core.Vertx;
 

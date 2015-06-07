@@ -5,6 +5,11 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
+version = '1.0.0-SNAPSHOT'
+group = 'de.undercouch'
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
 repositories {
     mavenCentral()
     maven {

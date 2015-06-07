@@ -12,15 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package io.vertx.lang.typescript.compiler;
+package de.undercouch.vertx.lang.typescript.compiler;
 
 import static org.junit.Assert.assertEquals;
-import io.vertx.lang.typescript.TypeScriptClassLoader;
-import io.vertx.lang.typescript.cache.NoopCache;
 
 import java.io.IOException;
 
 import org.junit.Test;
+
+import de.undercouch.vertx.lang.typescript.TypeScriptClassLoader;
+import de.undercouch.vertx.lang.typescript.cache.NoopCache;
+import de.undercouch.vertx.lang.typescript.compiler.Source;
+import de.undercouch.vertx.lang.typescript.compiler.SourceFactory;
+import de.undercouch.vertx.lang.typescript.compiler.TypeScriptCompiler;
 
 /**
  * Common tests for all compilers

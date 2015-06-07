@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package io.vertx.lang.typescript.compiler;
+package de.undercouch.vertx.lang.typescript.compiler;
 
-import java.io.IOException;
+import de.undercouch.vertx.lang.typescript.compiler.NodeCompiler;
+import de.undercouch.vertx.lang.typescript.compiler.TypeScriptCompiler;
 
 /**
- * Loads source files
+ * Tests the {@link NodeCompiler}
  * @author Michel Kraemer
  */
-public interface SourceFactory {
-  /**
-   * Loads a source file
-   * @param filename the name of the file to load
-   * @return the source object
-   * @throws IOException if the source file could not be loaded
-   */
-  Source getSource(String filename) throws IOException;
+public class NodeCompilerTest extends CompilerTestBase {
+  private NodeCompiler compiler = new NodeCompiler();
+
+  @Override
+  protected TypeScriptCompiler getCompiler() {
+    return compiler;
+  }
 }

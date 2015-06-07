@@ -12,12 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package io.vertx.lang.typescript;
-
-import io.vertx.lang.typescript.cache.Cache;
-import io.vertx.lang.typescript.compiler.Source;
-import io.vertx.lang.typescript.compiler.SourceFactory;
-import io.vertx.lang.typescript.compiler.TypeScriptCompiler;
+package de.undercouch.vertx.lang.typescript;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -27,6 +22,11 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+
+import de.undercouch.vertx.lang.typescript.cache.Cache;
+import de.undercouch.vertx.lang.typescript.compiler.Source;
+import de.undercouch.vertx.lang.typescript.compiler.SourceFactory;
+import de.undercouch.vertx.lang.typescript.compiler.TypeScriptCompiler;
 
 /**
  * A special class loader that automatically compiles loaded TypeScript

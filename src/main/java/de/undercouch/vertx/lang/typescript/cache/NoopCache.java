@@ -12,17 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package io.vertx.lang.typescript.compiler;
+package de.undercouch.vertx.lang.typescript.cache;
+
+import de.undercouch.vertx.lang.typescript.compiler.Source;
 
 /**
- * Tests the {@link EngineCompiler}
+ * A dummy cache that never stores anything
  * @author Michel Kraemer
  */
-public class EngineCompilerTest extends CompilerTestBase {
-  private EngineCompiler compiler = new EngineCompiler();
+public class NoopCache implements Cache {
+  @Override
+  public String get(Source src) {
+    return null;
+  }
 
   @Override
-  protected TypeScriptCompiler getCompiler() {
-    return compiler;
+  public void put(Source src, String value) {
+    // do not cache
   }
 }

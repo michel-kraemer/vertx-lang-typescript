@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package io.vertx.lang.typescript.compiler;
+package de.undercouch.vertx.lang.typescript.compiler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

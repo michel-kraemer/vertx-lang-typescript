@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package io.vertx.lang.typescript;
+package de.undercouch.vertx.lang.typescript;
 
 import io.vertx.core.Context;
 import io.vertx.core.Future;
@@ -20,15 +20,16 @@ import io.vertx.core.Verticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.spi.VerticleFactory;
 import io.vertx.lang.js.JSVerticleFactory;
-import io.vertx.lang.typescript.cache.Cache;
-import io.vertx.lang.typescript.cache.DiskCache;
-import io.vertx.lang.typescript.cache.InMemoryCache;
-import io.vertx.lang.typescript.cache.NoopCache;
-import io.vertx.lang.typescript.compiler.EngineCompiler;
-import io.vertx.lang.typescript.compiler.NodeCompiler;
-import io.vertx.lang.typescript.compiler.TypeScriptCompiler;
 
 import java.io.File;
+
+import de.undercouch.vertx.lang.typescript.cache.Cache;
+import de.undercouch.vertx.lang.typescript.cache.DiskCache;
+import de.undercouch.vertx.lang.typescript.cache.InMemoryCache;
+import de.undercouch.vertx.lang.typescript.cache.NoopCache;
+import de.undercouch.vertx.lang.typescript.compiler.EngineCompiler;
+import de.undercouch.vertx.lang.typescript.compiler.NodeCompiler;
+import de.undercouch.vertx.lang.typescript.compiler.TypeScriptCompiler;
 
 /**
  * A factory for verticles written in TypeScript

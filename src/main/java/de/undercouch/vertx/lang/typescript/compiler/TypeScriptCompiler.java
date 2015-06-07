@@ -12,27 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package io.vertx.lang.typescript.cache;
+package de.undercouch.vertx.lang.typescript.compiler;
 
-import io.vertx.lang.typescript.compiler.Source;
+import java.io.IOException;
 
 /**
- * A cache for already compiled sources
+ * Compiles TypeScript source files
  * @author Michel Kraemer
  */
-public interface Cache {
+public interface TypeScriptCompiler {
   /**
-   * Get the compiled code for a given source
-   * @param src the source
-   * @return the compiled code or null if the cache does not contain code
-   * for the given source
+   * Compiles the given TypeScript file
+   * @param filename the name of the file to compile
+   * @param sourceFactory the factory that loads source files
+   * @return the generated code
+   * @throws IOException if one of the source files to compile could not be loaded
    */
-  String get(Source src);
-  
-  /**
-   * Add compiled code to the cache
-   * @param src the source
-   * @param value the compiled code
-   */
-  void put(Source src, String value);
+  String compile(String filename, SourceFactory sourceFactory) throws IOException;
 }
