@@ -1,4 +1,4 @@
-Vert.x 3.0 TypeScript Support
+Vert.x 3.0 TypeScript Support [![Build Status](https://travis-ci.org/michel-kraemer/vertx-lang-typescript.svg?branch=master)](https://travis-ci.org/michel-kraemer/vertx-lang-typescript)
 =============================
 
 This library adds TypeScript support to [Vert.x 3.0](http://vertx.io).
