@@ -8,3 +8,4 @@ src-gen/
 typescript_code_cache/
 .classpath
 .project
+gradle.properties
