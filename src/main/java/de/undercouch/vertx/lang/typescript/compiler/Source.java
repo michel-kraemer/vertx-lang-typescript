@@ -88,6 +88,7 @@ public class Source {
   /**
    * Creates a new source object from a stream. Does not close the given stream.
    * @param is the input stream to read
+   * @param filename the name of the file the new source should represent
    * @param cs the character set to use when reading
    * @return the new source object
    * @throws IOException if reading from the given stream failed
