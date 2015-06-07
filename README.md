@@ -12,6 +12,53 @@ in `.ts` will automatically be compiled to JavaScript when they are executed.
 
 The library also contains the type definitions for the Vert.x JavaScript API.
 
+### Add to local Vert.x installation
+
+Download the [library's main jar](https://oss.sonatype.org/content/repositories/snapshots/de/undercouch/vertx-lang-typescript/1.0.0-SNAPSHOT/)
+and put it into the `lib` folder of your local Vert.x installation. It will be automatically
+added to the classpath by the Vert.x start script.
+
+### Add to your application
+
+If your application's build is based on **Maven** add the following lines to your
+`pom.xml`:
+
+```xml
+<repositories>
+    <repository>
+        <id>sonatype-nexus-snapshots</id>
+        <name>Sonatype Nexus Snapshots</name>
+        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        <releases>
+            <enabled>false</enabled>
+        </releases>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+    </repository>
+</repositories>
+
+<dependency>
+    <groupId>de.undercouch</groupId>
+    <artifactId>vertx-lang-typescript</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+</dependency>
+```
+
+If you use **Gradle** add the following to your `build.gradle`:
+
+```gradle
+repositories {
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots'
+    }
+}
+
+dependencies {
+    compile 'de.undercouch:vertx-lang-typescript:1.0.0-SNAPSHOT'
+}
+```
+
 Example
 -------
 
