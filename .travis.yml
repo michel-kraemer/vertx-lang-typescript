@@ -1,1 +1,3 @@
-script: "chmod 755 gradlew && ./gradlew check"
+language: java
+jdk:
+  - oraclejdk8
