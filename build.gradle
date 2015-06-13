@@ -20,7 +20,7 @@ repositories {
 }
 
 configurations {
-    core
+    vertx
     codegen
 }
 
@@ -30,13 +30,24 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
 
-    core group: 'io.vertx', name: 'vertx-core', version: '3.0.0-milestone6', classifier: 'sources'
+    vertx group: 'io.vertx', name: 'vertx-auth-common', version: '3.0.0-milestone6', classifier: 'sources'
+    vertx group: 'io.vertx', name: 'vertx-core', version: '3.0.0-milestone6', classifier: 'sources'
+    vertx group: 'io.vertx', name: 'vertx-rx-java', version: '3.0.0-milestone6', classifier: 'sources'
+    vertx group: 'io.vertx', name: 'vertx-web', version: '3.0.0-milestone6', classifier: 'sources'
 
+    codegen 'io.vertx:vertx-auth-common:3.0.0-milestone6'
     codegen 'io.vertx:vertx-core:3.0.0-milestone6'
     codegen 'io.vertx:vertx-codegen:3.0.0-milestone6'
     codegen 'io.vertx:vertx-docgen:3.0.0-milestone6'
+    codegen 'io.vertx:vertx-web:3.0.0-milestone6'
+    
+    // explicitly declare optional dependencies of the vertx library above
+    codegen 'com.github.jknack:handlebars:1.3.0'
+    codegen 'de.neuland-bfi:jade4j:0.4.0'
+    codegen 'io.reactivex:rxjava:1.0.0-rc.3'
     codegen 'log4j:log4j:1.2.16'
     codegen 'org.slf4j:slf4j-api:1.6.2'
+    codegen 'org.thymeleaf:thymeleaf:2.1.2.RELEASE'
 }
 
 task wrapper(type: Wrapper) {
@@ -135,16 +146,16 @@ sourceSets {
     }
 }
 
-task copyCore(type: Copy) {
+task copyVertx(type: Copy) {
     from {
-        configurations.core.collect { zipTree(it) }
+        configurations.vertx.collect { zipTree(it) }
     }
-    into new File(buildDir, 'core')
-    include "io/vertx/core/**"
+    into new File(buildDir, 'vertx')
+    include "io/vertx/**"
 }
 
-task generateTypeDefinitions(type: JavaCompile, dependsOn: copyCore) {
-    source = new File(buildDir, 'core')
+task generateTypeDefinitions(type: JavaCompile, dependsOn: copyVertx) {
+    source = new File(buildDir, 'vertx')
     classpath = configurations.codegen + files(sourceSets.main.resources.srcDirs)
     options.compilerArgs = [
             '-proc:only',
@@ -155,8 +166,8 @@ task generateTypeDefinitions(type: JavaCompile, dependsOn: copyCore) {
 }
 
 task copyTypeDefinitions(type: Copy, dependsOn: generateTypeDefinitions) {
-    from new File(generateTypeDefinitions.destinationDir, 'resources/vertx-typescript')
-    into new File(projectDir, 'src-gen/main/resources/vertx-typescript')
+    from new File(generateTypeDefinitions.destinationDir, 'resources')
+    into new File(projectDir, 'src-gen/main/resources')
 }
 
 task copyRequiredResources(type: Copy, dependsOn: [copyTypeDefinitions, npmInstall]) {

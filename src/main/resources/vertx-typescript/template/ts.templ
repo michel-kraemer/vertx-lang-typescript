@@ -11,7 +11,11 @@
 
 @code{
   def genModuleName(moduleType) {
-    return helper.convertCamelCaseToUnderscores(moduleType.raw.simpleName) + '.d.ts';
+    String sn = helper.convertCamelCaseToUnderscores(moduleType.raw.simpleName);
+    if (!type.raw.moduleName.equals(moduleType.raw.moduleName)) {
+      sn = "../" + moduleType.raw.moduleName + "-typescript/" + sn;
+    }
+    return sn + '.d.ts';
   }
 }
 
@@ -78,7 +82,11 @@
 @comment{"Generate interface"}
 @comment{"=================="}
 
+@if{type.raw.moduleName.equals("vertx")}
 /// <reference path="throwable.d.ts" />
+@else{}
+/// <reference path="../vertx-typescript/throwable.d.ts" />
+@end{}
 @foreach{referencedType : referencedTypes}
 /// <reference path="@{genModuleName(referencedType)}" />
 @end{}
