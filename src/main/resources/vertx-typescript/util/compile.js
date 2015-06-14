@@ -27,7 +27,7 @@ function compileTypescript(file) {
   // prepare a host object that we can pass to the TypeScript compiler
   var host = {
     getDefaultLibFilename: function() {
-      return "typescript/bin/" + (opts.target === 2 ? "lib.es6.d.ts" : "lib.d.ts");
+      return "typescript/bin/" + (opts.target === 2 ? "lib.core.es6.d.ts" : "lib.core.d.ts");
     },
 
     getCurrentDirectory: function() {

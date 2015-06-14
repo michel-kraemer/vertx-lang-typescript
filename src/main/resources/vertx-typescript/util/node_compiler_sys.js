@@ -3,6 +3,18 @@
   var path = require("path");
   
   process.stdin.resume();
+  
+  // override host to use the lib.core.d.ts instead of lib.d.ts. The latter
+  // contains too many definitions that we don't need. In fact WebSocket
+  // conflicts with Vert.x WebSocket.
+  var oldCreateCompilerHost = ts.createCompilerHost;
+  ts.createCompilerHost = function(options) {
+    var host = oldCreateCompilerHost(options);
+    host.getDefaultLibFilename = function(options) {
+      return "typescript/bin/" + (options.target === 2 ? "lib.core.es6.d.ts" : "lib.core.d.ts");
+    };
+    return host;
+  };
 
   ts.sys.readFile = function(fileName, encoding) {
     // send tag and filename to parent process
