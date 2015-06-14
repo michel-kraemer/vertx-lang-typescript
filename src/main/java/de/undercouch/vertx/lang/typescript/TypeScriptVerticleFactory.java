@@ -48,6 +48,12 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
   public static final String PROP_NAME_CACHE_DIR = "vertx.typescriptCacheDir";
   
   /**
+   * The name of the system property specifying that the Node.js compiler
+   * should not be used even if Node.js is available.
+   */
+  public static final String PROP_NAME_DISABLE_NODE_COMPILER = "vertx.disableNodeCompiler";
+  
+  /**
    * Do not cache compiled sources (default)
    */
   public static final String CACHE_NONE = "none";
@@ -77,6 +83,11 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
    * The cache directory (only used if disk cache is enabled)
    */
   private static final String CACHE_DIR = System.getProperty(PROP_NAME_CACHE_DIR, DEFAULT_CACHE_DIR);
+  
+  /**
+   * True if the Node.js compiler should not be used even if Node.js is available
+   */
+  private static final boolean DISABLE_NODE_COMPILER = Boolean.getBoolean(PROP_NAME_DISABLE_NODE_COMPILER);
   
   /**
    * The actual code cache
@@ -133,7 +144,7 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
    */
   private TypeScriptCompiler getTypeScriptCompiler() {
     if (compiler == null) {
-      if (NodeCompiler.supportsNode()) {
+      if (!DISABLE_NODE_COMPILER && NodeCompiler.supportsNode()) {
         compiler = new NodeCompiler();
       } else {
         compiler = new EngineCompiler();
