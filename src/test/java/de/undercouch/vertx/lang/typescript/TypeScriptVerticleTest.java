@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Arrays;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,6 +44,8 @@ public class TypeScriptVerticleTest {
   @Rule
   public RunTestOnContext runTestOnContext = new RunTestOnContext();
   
+  private Vertx vertx;
+  
   @Parameterized.Parameters
   public static Iterable<Boolean> useNodeCompiler() {
     if (NodeCompiler.supportsNode()) {
@@ -55,6 +58,11 @@ public class TypeScriptVerticleTest {
   public TypeScriptVerticleTest(boolean useNodeCompiler) {
     System.setProperty(TypeScriptVerticleFactory.PROP_NAME_DISABLE_NODE_COMPILER,
         String.valueOf(!useNodeCompiler));
+  }
+  
+  @Before
+  public void before(TestContext context) {
+    vertx = Vertx.vertx();
   }
   
   /**
@@ -81,23 +89,17 @@ public class TypeScriptVerticleTest {
   @Test
   public void simpleServer(TestContext context) throws Exception {
     Async async = context.async();
-    
     int port = getAvailablePort();
-    Vertx vertx = runTestOnContext.vertx();
     JsonObject config = new JsonObject().put("port", port);
     DeploymentOptions options = new DeploymentOptions().setConfig(config);
-    vertx.deployVerticle("simpleServer.ts", options, ar -> {
-      context.assertTrue(ar.succeeded());
+    vertx.deployVerticle("simpleServer.ts", options, context.asyncAssertSuccess(deploymentID -> {
       vertx.createHttpClient().getNow(port, "localhost", "/", response -> {
         response.bodyHandler(buffer -> {
           context.assertEquals("Hello", buffer.toString());
-          vertx.undeploy(ar.result(), ar2 -> {
-            context.assertTrue(ar2.succeeded());
-            async.complete();
-          });
+          vertx.undeploy(deploymentID, context.asyncAssertSuccess(r -> async.complete()));
         });
       });
-    });
+    }));
   }
   
   /**
@@ -107,22 +109,16 @@ public class TypeScriptVerticleTest {
   @Test
   public void routingServer(TestContext context) throws Exception {
     Async async = context.async();
-    
     int port = getAvailablePort();
-    Vertx vertx = runTestOnContext.vertx();
     JsonObject config = new JsonObject().put("port", port);
     DeploymentOptions options = new DeploymentOptions().setConfig(config);
-    vertx.deployVerticle("routingServer.ts", options, ar -> {
-      context.assertTrue(ar.succeeded());
+    vertx.deployVerticle("routingServer.ts", options, context.asyncAssertSuccess(deploymentID -> {
       vertx.createHttpClient().getNow(port, "localhost", "/", response -> {
         response.bodyHandler(buffer -> {
           context.assertEquals("Hello Routing", buffer.toString());
-          vertx.undeploy(ar.result(), ar2 -> {
-            context.assertTrue(ar2.succeeded());
-            async.complete();
-          });
+          vertx.undeploy(deploymentID, context.asyncAssertSuccess(r -> async.complete()));
         });
       });
-    });
+    }));
   }
 }
