@@ -31,6 +31,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'io.vertx:vertx-auth-common:3.0.0-milestone6'
     testCompile 'io.vertx:vertx-web:3.0.0-milestone6'
+    testCompile 'io.vertx:vertx-unit:3.0.0-milestone6'
 
     vertx group: 'io.vertx', name: 'vertx-auth-common', version: '3.0.0-milestone6', classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-core', version: '3.0.0-milestone6', classifier: 'sources'

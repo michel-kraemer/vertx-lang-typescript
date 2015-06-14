@@ -85,11 +85,6 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
   private static final String CACHE_DIR = System.getProperty(PROP_NAME_CACHE_DIR, DEFAULT_CACHE_DIR);
   
   /**
-   * True if the Node.js compiler should not be used even if Node.js is available
-   */
-  private static final boolean DISABLE_NODE_COMPILER = Boolean.getBoolean(PROP_NAME_DISABLE_NODE_COMPILER);
-  
-  /**
    * The actual code cache
    */
   private static final Cache CACHE;
@@ -143,8 +138,9 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
    * @return the best available TypeScript compiler
    */
   private TypeScriptCompiler getTypeScriptCompiler() {
+    boolean disableNodeCompiler = Boolean.getBoolean(PROP_NAME_DISABLE_NODE_COMPILER);
     if (compiler == null) {
-      if (!DISABLE_NODE_COMPILER && NodeCompiler.supportsNode()) {
+      if (!disableNodeCompiler && NodeCompiler.supportsNode()) {
         compiler = new NodeCompiler();
       } else {
         compiler = new EngineCompiler();
