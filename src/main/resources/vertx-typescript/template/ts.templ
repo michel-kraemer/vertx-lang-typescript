@@ -87,6 +87,9 @@
 @else{}
 /// <reference path="../vertx-js/throwable.d.ts" />
 @end{}
+@if{ifaceSimpleName == 'Vertx'}
+/// <reference path="console.d.ts" />
+@end{}
 @foreach{referencedType : referencedTypes}
 /// <reference path="@{genModuleName(referencedType)}" />
 @end{}
@@ -122,4 +125,5 @@ declare var @{ifaceSimpleName}: {
 
 @if{ifaceSimpleName == 'Vertx'}
 declare var vertx: Vertx;
+declare var console: Console;
 @end{}

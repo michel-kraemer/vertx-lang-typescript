@@ -9,3 +9,5 @@ router.route().handler(routingContext => {
 });
 
 vertx.createHttpServer().requestHandler(router.accept).listen(8080);
+
+console.log("Listening...");
