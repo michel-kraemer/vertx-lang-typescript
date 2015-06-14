@@ -21,6 +21,9 @@ function compileTypescript(file) {
   var output = "";
   var opts = ts.getDefaultCompilerOptions();
 
+  // enable commonjs modules
+  opts.module = 1; // 1 = CommonJS
+
   // prepare a host object that we can pass to the TypeScript compiler
   var host = {
     getDefaultLibFilename: function() {
@@ -50,6 +53,11 @@ function compileTypescript(file) {
         var input = __sourceFactory.getSource(filename);
         body = input.toString();
       } catch (e) {
+        if (e instanceof java.io.FileNotFoundException) {
+          // the original version of this method just returns 'undefined'
+          // if it could not find a file
+          return undefined;
+        }
         if (onError) {
           onError(e.getMessage() || "Unknown error");
         }

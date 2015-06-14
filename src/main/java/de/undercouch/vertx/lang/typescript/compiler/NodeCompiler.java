@@ -16,6 +16,7 @@ package de.undercouch.vertx.lang.typescript.compiler;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,7 +69,8 @@ public class NodeCompiler implements TypeScriptCompiler {
       throws IOException {
     String temporaryCompilerPath = getTemporaryCompiler(sourceFactory);
     
-    ProcessBuilder processBuilder = new ProcessBuilder("node", temporaryCompilerPath, filename);
+    ProcessBuilder processBuilder = new ProcessBuilder("node", temporaryCompilerPath,
+        "--module", "commonjs", filename);
     processBuilder.redirectErrorStream(true);
     
     Process process = processBuilder.start();
@@ -84,11 +86,21 @@ public class NodeCompiler implements TypeScriptCompiler {
       if (line.startsWith("VERTX_TYPESCRIPT_READFILE")) {
         // compiler wants us to read a file
         String fileToRead = line.substring("VERTX_TYPESCRIPT_READFILE".length());
-        Source src = sourceFactory.getSource(fileToRead);
+        Source src;
+        String contents;
+        int length;
+        try {
+          src = sourceFactory.getSource(fileToRead);
+          contents = src.toString();
+          length = contents.length();
+        } catch (FileNotFoundException e) {
+          // send -1 to indicate the file was not found
+          contents = "";
+          length = -1;
+        }
         
         // send length of file contents, a space character and then the file contents
-        String contents = src.toString();
-        pw.append(String.valueOf(contents.length()));
+        pw.append(String.valueOf(length));
         pw.append(' ');
         pw.append(contents);
         pw.flush();

@@ -1,5 +1,11 @@
-/// <reference path="vertx-typescript/vertx.d.ts" />
+/// <reference path="vertx-js/vertx.d.ts" />
 
-vertx.createHttpServer().requestHandler(req => {
-  req.response().putHeader("Content-Type", "text/html").end("Hello");
-}).listen(8080);
+import Router = require("vertx-web-js/router");
+
+var router = Router.router(vertx);
+router.route().handler(routingContext => {
+  var response = routingContext.response();
+  response.putHeader("Content-Type", "text/html").end("Hello");
+});
+
+vertx.createHttpServer().requestHandler(router.accept).listen(8080);

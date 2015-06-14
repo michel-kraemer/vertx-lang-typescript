@@ -23,6 +23,11 @@
       }
       size += c;
     } while(true);
+    
+    if (size < 0) {
+      // file not found
+      return undefined;
+    }
 
     // read file contents from stdin
     size = parseInt(size);

@@ -13,7 +13,7 @@
   def genModuleName(moduleType) {
     String sn = helper.convertCamelCaseToUnderscores(moduleType.raw.simpleName);
     if (!type.raw.moduleName.equals(moduleType.raw.moduleName)) {
-      sn = "../" + moduleType.raw.moduleName + "-typescript/" + sn;
+      sn = "../" + moduleType.raw.moduleName + "-js/" + sn;
     }
     return sn + '.d.ts';
   }
@@ -85,11 +85,15 @@
 @if{type.raw.moduleName.equals("vertx")}
 /// <reference path="throwable.d.ts" />
 @else{}
-/// <reference path="../vertx-typescript/throwable.d.ts" />
+/// <reference path="../vertx-js/throwable.d.ts" />
 @end{}
 @foreach{referencedType : referencedTypes}
 /// <reference path="@{genModuleName(referencedType)}" />
 @end{}
+
+declare module "@{type.raw.moduleName}-js/@{helper.convertCamelCaseToUnderscores(type.raw.simpleName)}" {
+  export = @{ifaceSimpleName};
+}
 
 @if{doc != null}
 /**
@@ -107,14 +111,14 @@ interface @{ifaceSimpleName} {
   @if{method.staticMethod}@code{hasStaticMethods = true}@end{}
 @end{}
 
-@if{hasStaticMethods}
 declare var @{ifaceSimpleName}: {
   new(): @{ifaceSimpleName};
-  @foreach{method:methods}
-    @includeNamed{'genMethod';static=true}
-  @end{}
-}
+@if{hasStaticMethods}
+@foreach{method:methods}
+  @includeNamed{'genMethod';static=true}
 @end{}
+@end{}
+}
 
 @if{ifaceSimpleName == 'Vertx'}
 declare var vertx: Vertx;

@@ -65,7 +65,7 @@ Example
 The following script creates an HTTP server:
 
 ```typescript
-/// <reference path="vertx-typescript/vertx.d.ts" />
+/// <reference path="vertx-js/vertx.d.ts" />
 
 vertx.createHttpServer().requestHandler(req => {
   req.response().putHeader("Content-Type", "text/html").end("Hello");
