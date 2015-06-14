@@ -8,3 +8,6 @@ install:
 cache:
   directories:
     - $HOME/.gradle
+env:
+  global:
+    JAVA_OPTS=-Xmx128m
