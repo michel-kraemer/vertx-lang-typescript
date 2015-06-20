@@ -104,41 +104,41 @@ uploadArchives {
             
             // pom file details
             pom.project {
-               name 'vertx-lang-typescript'
-               packaging 'jar'
-               description 'TypeScript support for Vert.x 3.0'
-               url 'https://github.com/michel-kraemer/vertx-lang-typescript'
- 
-               scm {
-                   url 'https://github.com/michel-kraemer/vertx-lang-typescript'
-                   connection 'scm:git:git://github.com/michel-kraemer/vertx-lang-typescript.git'
-                   developerConnection 'scm:git:ssh:git@github.com:michel-kraemer/vertx-lang-typescript.git'
-               }
- 
-               licenses {
-                   license {
-                       name 'The Apache Software License, Version 2.0'
-                       url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                       distribution 'repo'
-                   }
-               }
- 
-               developers {
-                   developer {
-                       id 'michel-kraemer'
-                       name 'Michel Kraemer'
-                       email 'michel@undercouch.de'
-                   }
-               }
-           }
+                name 'vertx-lang-typescript'
+                packaging 'jar'
+                description 'TypeScript support for Vert.x 3.0'
+                url 'https://github.com/michel-kraemer/vertx-lang-typescript'
+
+                scm {
+                    url 'https://github.com/michel-kraemer/vertx-lang-typescript'
+                    connection 'scm:git:git://github.com/michel-kraemer/vertx-lang-typescript.git'
+                    developerConnection 'scm:git:ssh:git@github.com:michel-kraemer/vertx-lang-typescript.git'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'michel-kraemer'
+                        name 'Michel Kraemer'
+                        email 'michel@undercouch.de'
+                    }
+                }
+            }
         }
     }
 }
 
 node {
-  version = '0.12.4'
-  npmVersion = '2.1.6'
-  download = true
+    version = '0.12.4'
+    npmVersion = '2.1.6'
+    download = true
 }
 
 sourceSets {
