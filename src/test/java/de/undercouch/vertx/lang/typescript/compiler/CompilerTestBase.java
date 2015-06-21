@@ -22,9 +22,6 @@ import org.junit.Test;
 
 import de.undercouch.vertx.lang.typescript.TypeScriptClassLoader;
 import de.undercouch.vertx.lang.typescript.cache.NoopCache;
-import de.undercouch.vertx.lang.typescript.compiler.Source;
-import de.undercouch.vertx.lang.typescript.compiler.SourceFactory;
-import de.undercouch.vertx.lang.typescript.compiler.TypeScriptCompiler;
 
 /**
  * Common tests for all compilers
