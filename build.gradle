@@ -1,5 +1,6 @@
 plugins {
     id 'com.moowork.node' version '0.10'
+    id 'de.undercouch.download' version '1.2'
 }
 
 apply plugin: 'java'
@@ -7,10 +8,16 @@ apply plugin: 'eclipse'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+import de.undercouch.gradle.tasks.download.Download
+
 version = '1.0.0-SNAPSHOT'
 group = 'de.undercouch'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
+
+ext {
+    vertxExamplesSHA = 'f41e5e6eebce98661e9f995a610b0efd170c2ed5'
+}
 
 repositories {
     mavenCentral()
@@ -181,3 +188,25 @@ task copyRequiredResources(type: Copy, dependsOn: [copyTypeDefinitions, npmInsta
 processResources.dependsOn(copyRequiredResources)
 
 eclipseClasspath.dependsOn(processResources)
+
+task downloadExamples(type: Download) {
+    src "https://github.com/vert-x3/vertx-examples/archive/${vertxExamplesSHA}.zip"
+    dest new File(buildDir, 'vertx-examples.zip')
+    overwrite false
+}
+
+task unzipExamples(dependsOn: downloadExamples, type: Copy) {
+    from zipTree(downloadExamples.dest)
+    into buildDir
+}
+
+task testExamples(dependsOn: [ unzipExamples, testClasses ]) << {
+    def cp = project.test.classpath
+    def urls = cp.files.collect { it.toURI().toURL() }
+    def cl = new URLClassLoader(urls.toArray(new URL[urls.size()]))
+    def cls = cl.loadClass("de.undercouch.vertx.lang.typescript.TestExamplesRunner")
+    def runner = cls.newInstance()
+    runner.run(new File(buildDir, "vertx-examples-$vertxExamplesSHA/core-examples"), null, null)
+}
+
+test.dependsOn(testExamples)
