@@ -45,9 +45,6 @@ public class TestExamplesRunner {
     // also skip npm examples
     DEFAULT_DIRS_TO_SKIP.add("npm");
     
-    // missing method writeBinaryMessage
-    DEFAULT_DIRS_TO_SKIP.add("websockets");
-    
     // these scripts use 'string.startsWith' which is only available on
     // java.lang.String or with ES6
     DEFAULT_FILES_TO_SKIP.add("simple_form_server.js");
