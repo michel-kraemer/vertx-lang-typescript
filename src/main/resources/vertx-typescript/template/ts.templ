@@ -51,9 +51,7 @@
     } else if (type.kind == CLASS_OBJECT) {
       return 'any';
     } else if (type.kind == CLASS_HANDLER) {
-      if (type.args[0].kind == CLASS_VOID) {
-        return '() => void';
-      } else if (type.args[0].kind == CLASS_ASYNC_RESULT) {
+      if (type.args[0].kind == CLASS_ASYNC_RESULT) {
         return '(res: ' + genTSType(type.args[0].args[0]) + ', err?: Throwable) => void';
       } else {
         return '(e: ' + genTSType(type.args[0]) + ') => void';
