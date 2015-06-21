@@ -14,11 +14,10 @@
 
 package de.undercouch.vertx.lang.typescript.compiler;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.function.Function;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
@@ -65,10 +64,34 @@ public class EngineCompiler implements TypeScriptCompiler {
     }
     
     // load TypeScript compiler
-    loadScript(TYPESCRIPT_JS);
+    loadScript(TYPESCRIPT_JS, src -> {
+      // WORKAROUND for a bug in Nashorn (https://bugs.openjdk.java.net/browse/JDK-8079426)
+      // Inside the TypeScript compiler `ts.Diagnostics` is defined as a literal
+      // with more than 256 items. This causes all elements to be undefined.
+      // The bug has been fixed but it still occurs in Java 8u45.
+      
+      // find function where the diagnostics are defined
+      String startStr = "ts.Diagnostics = {";
+      String endStr = "};";
+      int start = src.indexOf(startStr);
+      int end = src.indexOf(endStr, start);
+      String diagnostics = src.substring(start + startStr.length(), end);
+      
+      // change lines so properties are set one by one
+      String[] diagLines = diagnostics.split("\n");
+      for (int i = 0; i < diagLines.length; ++i) {
+        diagLines[i] = diagLines[i].replaceFirst("^\\s*(.+?):", "ts.Diagnostics.$1 =");
+      }
+      
+      // replace original lines with new ones
+      String newDiagnostics = startStr + "};\n" + String.join("\n", diagLines) + ";";
+      src = src.substring(0, start) + newDiagnostics + src.substring(end + endStr.length());
+      
+      return src;
+    });
     
     // load compile.js
-    loadScript(COMPILE_JS);
+    loadScript(COMPILE_JS, null);
     
     return engine;
   }
@@ -77,14 +100,18 @@ public class EngineCompiler implements TypeScriptCompiler {
    * Loads a JavaScript file and evaluate it within {@link #engine}
    * @param name the name of the file to load
    */
-  private void loadScript(String name) {
+  private void loadScript(String name, Function<String, String> processSource) {
     URL url = getClass().getClassLoader().getResource(name);
     if (url == null) {
       throw new IllegalStateException("Cannot find " + name + " on classpath");
     }
-
-    try (Reader r = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"))) {
-      engine.eval(r);
+    
+    try {
+      String src = Source.fromURL(url, StandardCharsets.UTF_8).toString();
+      if (processSource != null) {
+        src = processSource.apply(src);
+      }
+      engine.eval(src);
     } catch (ScriptException | IOException e) {
       throw new IllegalStateException("Could not evaluate " + name, e);
     }
