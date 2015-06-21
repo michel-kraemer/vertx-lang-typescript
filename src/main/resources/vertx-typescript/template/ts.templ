@@ -35,9 +35,9 @@
         return 'number';
       }
     } else if (type.kind == CLASS_JSON_OBJECT) {
-      return '{ [key: string]: any }';
+      return 'any';
     } else if (type.kind == CLASS_DATA_OBJECT) {
-      return '{ [key: string]: any }';
+      return 'any';
     } else if (type.kind == CLASS_JSON_ARRAY) {
       return '[]';
     } else if (type.kind == CLASS_ENUM) {
@@ -47,7 +47,7 @@
     } else if (type.kind.collection) {
       return 'Array<' + genTSType(type.args[0]) + '>';
     } else if (type.kind == CLASS_MAP) {
-      return '{ [key: string]: ' + genTSType(type.args[1]) + ' }';
+      return 'any';
     } else if (type.kind == CLASS_OBJECT) {
       return 'any';
     } else if (type.kind == CLASS_HANDLER) {
