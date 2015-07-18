@@ -16,7 +16,7 @@ sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 ext {
-    vertxVersion = '3.0.0-SNAPSHOT'
+    vertxVersion = '3.0.0'
     vertxExamplesSHA = 'f41e5e6eebce98661e9f995a610b0efd170c2ed5'
 }
 
