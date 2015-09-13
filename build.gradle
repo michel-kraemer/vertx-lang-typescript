@@ -41,13 +41,23 @@ dependencies {
     testCompile "io.vertx:vertx-unit:$vertxVersion"
 
     vertx group: 'io.vertx', name: 'vertx-auth-common', version: vertxVersion, classifier: 'sources'
+    vertx group: 'io.vertx', name: 'vertx-auth-jdbc', version: vertxVersion, classifier: 'sources'
+    vertx group: 'io.vertx', name: 'vertx-auth-jwt', version: vertxVersion, classifier: 'sources'
+    vertx group: 'io.vertx', name: 'vertx-auth-shiro', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-core', version: vertxVersion, classifier: 'sources'
+    vertx group: 'io.vertx', name: 'vertx-jdbc-client', version: vertxVersion, classifier: 'sources'
+    vertx group: 'io.vertx', name: 'vertx-mongo-client', version: vertxVersion, classifier: 'sources'
+    vertx group: 'io.vertx', name: 'vertx-redis-client', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-rx-java', version: vertxVersion, classifier: 'sources'
+    vertx group: 'io.vertx', name: 'vertx-sql-common', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-web', version: vertxVersion, classifier: 'sources'
 
+    codegen "io.vertx:vertx-auth-shiro:$vertxVersion"
     codegen "io.vertx:vertx-core:$vertxVersion"
     codegen "io.vertx:vertx-codegen:$vertxVersion"
     codegen "io.vertx:vertx-docgen:$vertxVersion"
+    codegen "io.vertx:vertx-jdbc-client:$vertxVersion"
+    codegen "io.vertx:vertx-mongo:$vertxVersion"
     codegen "io.vertx:vertx-web:$vertxVersion"
     
     // explicitly declare optional dependencies of the vertx library above
@@ -206,6 +216,10 @@ task testExamples(dependsOn: [ unzipExamples, testClasses ]) << {
     def cls = cl.loadClass("de.undercouch.vertx.lang.typescript.TestExamplesRunner")
     def runner = cls.newInstance()
     runner.run(new File(buildDir, "vertx-examples-$vertxExamplesSHA/core-examples"), null, null)
+    runner.run(new File(buildDir, "vertx-examples-$vertxExamplesSHA/jdbc-examples"), null, null)
+    runner.run(new File(buildDir, "vertx-examples-$vertxExamplesSHA/mongo-examples"), null, null)
+    runner.run(new File(buildDir, "vertx-examples-$vertxExamplesSHA/redis-examples"), null, null)
+    runner.run(new File(buildDir, "vertx-examples-$vertxExamplesSHA/web-examples"), null, null)
 }
 
 test.dependsOn(testExamples)

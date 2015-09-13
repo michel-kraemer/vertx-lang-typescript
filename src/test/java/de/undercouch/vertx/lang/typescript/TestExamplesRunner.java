@@ -54,10 +54,26 @@ public class TestExamplesRunner {
     
     // skip browser code
     DEFAULT_DIRS_TO_SKIP.add("webroot");
+    
+    // we don't support the eventbus-client yet
+    DEFAULT_FILES_TO_SKIP.add("web/vertxbus/node/index.js");
+    
+    // this example calls RoutingContext.fail() with a Throwable object
+    // instead of a status code (number)
+    DEFAULT_FILES_TO_SKIP.add("web/custom_authorisation/server.js");
   }
   
   private Set<String> dirsToSkip;
   private Set<String> filesToSkip;
+  
+  private boolean containsEndsWith(Set<String> haystack, String needle) {
+    for (String s : haystack) {
+      if (needle.endsWith(s)) {
+        return true;
+      }
+    }
+    return false;
+  }
   
   private void getAllJavaScriptFiles(File dir, List<File> result) {
     File[] files = dir.listFiles();
@@ -70,7 +86,8 @@ public class TestExamplesRunner {
         getAllJavaScriptFiles(f, result);
       } else {
         if (f.getName().toLowerCase().endsWith(".js")) {
-          if (filesToSkip == null || !filesToSkip.contains(f.getName())) {
+          if (filesToSkip == null || !containsEndsWith(filesToSkip,
+              f.getPath().replace(File.separatorChar, '/'))) {
             result.add(f);
           }
         }
