@@ -17,7 +17,7 @@ targetCompatibility = '1.8'
 
 ext {
     vertxVersion = '3.0.0'
-    vertxExamplesSHA = 'f41e5e6eebce98661e9f995a610b0efd170c2ed5'
+    vertxExamplesSHA = '6dcd9e7d3cb5a2b3797b8f789da1e0810e6bb8e3'
 }
 
 repositories {
