@@ -100,7 +100,35 @@ declare module "@{type.raw.moduleName}-js/@{helper.convertCamelCaseToUnderscores
 /**
 @{renderDocToHtml(" *", doc, renderLinkToHtml)}
  */@end{}
-interface @{ifaceSimpleName} {
+interface @{ifaceSimpleName}
+
+@if{concreteSuperTypes.size() > 0}
+  extends
+  @foreach{concreteSuperType: concreteSuperTypes}
+    @{genTSType(concreteSuperType)}
+  @end{}
+@end{}
+
+@if{abstractSuperTypes.size() > 0}
+  extends
+  @foreach{abstractSuperType: abstractSuperTypes}
+    @{genTSType(abstractSuperType)}
+  @end{', '}
+@end{}
+
+@comment{"TODO handle this!!"}
+@comment{
+@if{handlerSuperType != null}
+  @if{abstractSuperTypes.empty}
+    extends
+  @else{}
+    ,
+  @end{}
+  Handler
+@end{}
+}
+
+{
   @foreach{method:methods}
     @includeNamed{'genMethod';static=false}
   @end{}
