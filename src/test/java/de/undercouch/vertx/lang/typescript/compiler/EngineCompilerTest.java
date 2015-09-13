@@ -14,6 +14,8 @@
 
 package de.undercouch.vertx.lang.typescript.compiler;
 
+import org.junit.Before;
+
 import de.undercouch.vertx.lang.typescript.compiler.EngineCompiler;
 import de.undercouch.vertx.lang.typescript.compiler.TypeScriptCompiler;
 
@@ -23,6 +25,12 @@ import de.undercouch.vertx.lang.typescript.compiler.TypeScriptCompiler;
  */
 public class EngineCompilerTest extends CompilerTestBase {
   private EngineCompiler compiler = new EngineCompiler();
+
+  @Before
+  public void beforeMethod() {
+    // skip EngineCompiler tests on Travis CI, because they are likely to fail
+    org.junit.Assume.assumeTrue(!Boolean.parseBoolean(System.getenv("TRAVIS")));
+  }
 
   @Override
   protected TypeScriptCompiler getCompiler() {

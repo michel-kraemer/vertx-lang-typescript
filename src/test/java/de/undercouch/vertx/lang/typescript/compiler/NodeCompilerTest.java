@@ -14,9 +14,6 @@
 
 package de.undercouch.vertx.lang.typescript.compiler;
 
-import de.undercouch.vertx.lang.typescript.compiler.NodeCompiler;
-import de.undercouch.vertx.lang.typescript.compiler.TypeScriptCompiler;
-
 /**
  * Tests the {@link NodeCompiler}
  * @author Michel Kraemer
