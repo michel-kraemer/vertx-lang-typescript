@@ -61,6 +61,10 @@ public class TestExamplesRunner {
     // this example calls RoutingContext.fail() with a Throwable object
     // instead of a status code (number)
     DEFAULT_FILES_TO_SKIP.add("web/custom_authorisation/server.js");
+    
+    // no valid TypeScript (variable email needs to be of type 'any')
+    DEFAULT_FILES_TO_SKIP.add("mail_headers.js");
+    DEFAULT_FILES_TO_SKIP.add("mail_login.js");
   }
   
   private Set<String> dirsToSkip;

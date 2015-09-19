@@ -45,10 +45,14 @@ dependencies {
     vertx group: 'io.vertx', name: 'vertx-auth-jwt', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-auth-shiro', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-core', version: vertxVersion, classifier: 'sources'
+    vertx group: 'io.vertx', name: 'vertx-dropwizard-metrics', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-jdbc-client', version: vertxVersion, classifier: 'sources'
+    vertx group: 'io.vertx', name: 'vertx-mail-client', version: vertxVersion, classifier: 'sources'
+    vertx group: 'io.vertx', name: 'vertx-mail-service', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-mongo-client', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-redis-client', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-rx-java', version: vertxVersion, classifier: 'sources'
+    vertx group: 'io.vertx', name: 'vertx-service-proxy', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-sql-common', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-web', version: vertxVersion, classifier: 'sources'
 
@@ -60,9 +64,9 @@ dependencies {
     codegen "io.vertx:vertx-mongo:$vertxVersion"
     codegen "io.vertx:vertx-web:$vertxVersion"
     
-    // explicitly declare optional dependencies of the vertx library above
     codegen 'com.github.jknack:handlebars:1.3.0'
     codegen 'de.neuland-bfi:jade4j:0.4.0'
+    codegen 'io.dropwizard.metrics:metrics-core:3.1.0'
     codegen 'io.reactivex:rxjava:1.0.0-rc.3'
     codegen 'log4j:log4j:1.2.16'
     codegen 'org.slf4j:slf4j-api:1.6.2'
@@ -217,6 +221,8 @@ task testExamples(dependsOn: [ unzipExamples, testClasses ]) << {
     def runner = cls.newInstance()
     runner.run(new File(buildDir, "vertx-examples-$vertxExamplesSHA/core-examples"), null, null)
     runner.run(new File(buildDir, "vertx-examples-$vertxExamplesSHA/jdbc-examples"), null, null)
+    runner.run(new File(buildDir, "vertx-examples-$vertxExamplesSHA/mail-examples"), null, null)
+    runner.run(new File(buildDir, "vertx-examples-$vertxExamplesSHA/metrics-examples"), null, null)
     runner.run(new File(buildDir, "vertx-examples-$vertxExamplesSHA/mongo-examples"), null, null)
     runner.run(new File(buildDir, "vertx-examples-$vertxExamplesSHA/redis-examples"), null, null)
     runner.run(new File(buildDir, "vertx-examples-$vertxExamplesSHA/web-examples"), null, null)
