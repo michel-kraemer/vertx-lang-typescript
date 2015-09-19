@@ -189,8 +189,28 @@ task generateTypeDefinitions(type: JavaCompile, dependsOn: copyVertx) {
 }
 
 task copyTypeDefinitions(type: Copy, dependsOn: generateTypeDefinitions) {
+    def level = 0
+    
     from new File(generateTypeDefinitions.destinationDir, 'resources')
     into new File(projectDir, 'src-gen/main/resources')
+    filter { line ->
+        line.trim().isEmpty() ? null : line
+    }
+    filter { line ->
+        if (line.endsWith('{')) {
+            level++
+        } else if (line.endsWith('}')) {
+            level --
+        }
+        if (level > 0) {
+            return line.startsWith(' * ') ? "  $line" : line
+        } else {
+            return line
+        }
+    }
+    filter { line ->
+        line.trim() == '/**' || line.startsWith('declare ') ? "\n$line" : line
+    }
 }
 
 task copyRequiredResources(type: Copy, dependsOn: [copyTypeDefinitions, npmInstall]) {
