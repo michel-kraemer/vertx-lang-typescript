@@ -10,7 +10,7 @@
   var oldCreateCompilerHost = ts.createCompilerHost;
   ts.createCompilerHost = function(options) {
     var host = oldCreateCompilerHost(options);
-    host.getDefaultLibFilename = function(options) {
+    host.getDefaultLibFileName = function(options) {
       return "typescript/bin/" + (options.target === 2 ? "lib.core.es6.d.ts" : "lib.core.d.ts");
     };
     return host;

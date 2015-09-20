@@ -26,7 +26,7 @@ function compileTypescript(file) {
 
   // prepare a host object that we can pass to the TypeScript compiler
   var host = {
-    getDefaultLibFilename: function() {
+    getDefaultLibFileName: function() {
       return "typescript/bin/" + (opts.target === 2 ? "lib.core.es6.d.ts" : "lib.core.d.ts");
     },
 
@@ -71,38 +71,45 @@ function compileTypescript(file) {
       output += data;
     }
   };
-
-  var prog = ts.createProgram([file], opts, host);
-
-  var errs = prog.getDiagnostics();
-  if (errs.length) {
-    // TODO print diagnostics to errout
-    throw errs;
-  }
+  
+  var program = ts.createProgram([file], opts, host);
 
   function reportDiagnostic(diagnostic) {
     var output = "";
     if (diagnostic.file) {
-        var loc = diagnostic.file.getLineAndCharacterFromPosition(diagnostic.start);
-        output += diagnostic.file.filename + "(" + loc.line + "," + loc.character + "): ";
+        var loc = ts.getLineAndCharacterOfPosition(diagnostic.file, diagnostic.start);
+        output += diagnostic.file.fileName + "(" + (loc.line + 1) + "," + (loc.character + 1) + "): ";
     }
     var category = ts.DiagnosticCategory[diagnostic.category].toLowerCase();
-    output += category + " TS" + diagnostic.code + ": " + diagnostic.messageText + host.getNewLine();
+    output += category + " TS" + diagnostic.code + ": " + ts.flattenDiagnosticMessageText(diagnostic.messageText, ts.sys.newLine) + ts.sys.newLine;
     java.lang.System.err.println(output);
   }
 
+  function reportDiagnostics(diagnostics) {
+      for (var i = 0; i < diagnostics.length; i++) {
+          reportDiagnostic(diagnostics[i]);
+      }
+  }
+
   // report errors
-  var checker = prog.getTypeChecker(true);
-  errs = checker.getDiagnostics();
-  if (errs.length) {
-    errs.forEach(function(err) {
-      reportDiagnostic(err);
-    });
-    throw "Could not compile source file " + file;
+  var diagnostics = program.getSyntacticDiagnostics();
+  reportDiagnostics(diagnostics);
+  if (diagnostics.length === 0) {
+      var diagnostics = program.getGlobalDiagnostics();
+      reportDiagnostics(diagnostics);
+      if (diagnostics.length === 0) {
+          var diagnostics = program.getSemanticDiagnostics();
+          reportDiagnostics(diagnostics);
+      }
   }
 
   // generate code now
-  checker.emitFiles();
+  var emitOutput = program.emit();
+  reportDiagnostics(emitOutput.diagnostics);
+  
+  if (diagnostics.length > 0 || emitOutput.diagnostics.length > 0) {
+    throw "Could not compile source file " + file;
+  }
 
   return output;
 }

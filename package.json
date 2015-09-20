@@ -6,6 +6,6 @@
   "license": "EPL-1.0",
   "private": true,
   "dependencies": {
-    "typescript": "~1.4.1"
+    "typescript": "~1.5.0"
   }
 }
