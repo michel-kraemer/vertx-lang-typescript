@@ -81,7 +81,7 @@ function compileTypescript(file) {
         output += diagnostic.file.fileName + "(" + (loc.line + 1) + "," + (loc.character + 1) + "): ";
     }
     var category = ts.DiagnosticCategory[diagnostic.category].toLowerCase();
-    output += category + " TS" + diagnostic.code + ": " + ts.flattenDiagnosticMessageText(diagnostic.messageText, ts.sys.newLine) + ts.sys.newLine;
+    output += category + " TS" + diagnostic.code + ": " + ts.flattenDiagnosticMessageText(diagnostic.messageText, host.getNewLine()) + host.getNewLine();
     java.lang.System.err.println(output);
   }
 
