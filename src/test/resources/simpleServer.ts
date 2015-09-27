@@ -1,4 +1,4 @@
-/// <reference path="vertx-js/vertx.d.ts" />
+/// <reference path="../../../build/typings/vertx-js/vertx.d.ts" />
 
 var context = vertx.getOrCreateContext();
 var config = context.config();

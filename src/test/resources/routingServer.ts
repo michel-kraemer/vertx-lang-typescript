@@ -1,4 +1,5 @@
-/// <reference path="vertx-js/vertx.d.ts" />
+/// <reference path="../../../build/typings/vertx-js/vertx.d.ts" />
+/// <reference path="../../../build/typings/vertx-web-js/router.d.ts" />
 
 import Router = require("vertx-web-js/router");
 

@@ -39,6 +39,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile "io.vertx:vertx-web:$vertxVersion"
     testCompile "io.vertx:vertx-unit:$vertxVersion"
+    testCompile 'commons-io:commons-io:2.4'
 
     vertx group: 'io.vertx', name: 'vertx-auth-common', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-auth-jdbc', version: vertxVersion, classifier: 'sources'
@@ -63,7 +64,7 @@ dependencies {
     codegen "io.vertx:vertx-jdbc-client:$vertxVersion"
     codegen "io.vertx:vertx-mongo:$vertxVersion"
     codegen "io.vertx:vertx-web:$vertxVersion"
-    
+
     codegen 'com.github.jknack:handlebars:1.3.0'
     codegen 'de.neuland-bfi:jade4j:0.4.0'
     codegen 'io.dropwizard.metrics:metrics-core:3.1.0'
@@ -111,7 +112,7 @@ uploadArchives {
         mavenDeployer {
             // sign artifacts before upload
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-            
+
             // upload to sonatype OSS
             repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
                 authentication(userName: this.hasProperty('sonatypeUsername') ? sonatypeUsername : '',
@@ -121,7 +122,7 @@ uploadArchives {
                 authentication(userName: this.hasProperty('sonatypeUsername') ? sonatypeUsername : '',
                     password: this.hasProperty('sonatypePassword') ? sonatypePassword : '')
             }
-            
+
             // pom file details
             pom.project {
                 name 'vertx-lang-typescript'
@@ -188,11 +189,11 @@ task generateTypeDefinitions(type: JavaCompile, dependsOn: copyVertx) {
     destinationDir = new File(buildDir, 'generated')
 }
 
-task copyTypeDefinitions(type: Copy, dependsOn: generateTypeDefinitions) {
+task copyGeneratedTypeDefinitions(type: Copy, dependsOn: generateTypeDefinitions) {
     def level = 0
-    
+
     from new File(generateTypeDefinitions.destinationDir, 'resources')
-    into new File(projectDir, 'src-gen/main/resources')
+    into new File(buildDir, 'typings')
     filter { line ->
         line.trim().isEmpty() ? null : line
     }
@@ -211,6 +212,11 @@ task copyTypeDefinitions(type: Copy, dependsOn: generateTypeDefinitions) {
     filter { line ->
         line.trim() == '/**' || line.startsWith('declare ') ? "\n$line" : line
     }
+}
+
+task copyTypeDefinitions(type: Copy, dependsOn: copyGeneratedTypeDefinitions) {
+    from new File(projectDir, 'src/main/typings')
+    into new File(buildDir, 'typings')
 }
 
 task copyRequiredResources(type: Copy, dependsOn: [copyTypeDefinitions, npmInstall]) {
@@ -239,13 +245,15 @@ task testExamples(dependsOn: [ unzipExamples, testClasses ]) << {
     def cl = new URLClassLoader(urls.toArray(new URL[urls.size()]))
     def cls = cl.loadClass("de.undercouch.vertx.lang.typescript.TestExamplesRunner")
     def runner = cls.newInstance()
-    runner.run(new File(buildDir, "vertx-examples-$vertxExamplesSHA/core-examples"), null, null)
-    runner.run(new File(buildDir, "vertx-examples-$vertxExamplesSHA/jdbc-examples"), null, null)
-    runner.run(new File(buildDir, "vertx-examples-$vertxExamplesSHA/mail-examples"), null, null)
-    runner.run(new File(buildDir, "vertx-examples-$vertxExamplesSHA/metrics-examples"), null, null)
-    runner.run(new File(buildDir, "vertx-examples-$vertxExamplesSHA/mongo-examples"), null, null)
-    runner.run(new File(buildDir, "vertx-examples-$vertxExamplesSHA/redis-examples"), null, null)
-    runner.run(new File(buildDir, "vertx-examples-$vertxExamplesSHA/web-examples"), null, null)
+    def examplesDir = new File(buildDir, "vertx-examples-$vertxExamplesSHA")
+    def typingsDir = new File(buildDir, 'typings')
+    runner.run(new File(examplesDir, "core-examples"), typingsDir, null, null)
+    runner.run(new File(examplesDir, "jdbc-examples"), typingsDir, null, null)
+    runner.run(new File(examplesDir, "mail-examples"), typingsDir, null, null)
+    runner.run(new File(examplesDir, "metrics-examples"), typingsDir, null, null)
+    runner.run(new File(examplesDir, "mongo-examples"), typingsDir, null, null)
+    runner.run(new File(examplesDir, "redis-examples"), typingsDir, null, null)
+    runner.run(new File(examplesDir, "web-examples"), typingsDir, null, null)
 }
 
 test.dependsOn(testExamples)

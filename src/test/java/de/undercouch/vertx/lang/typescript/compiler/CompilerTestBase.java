@@ -17,6 +17,8 @@ package de.undercouch.vertx.lang.typescript.compiler;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.junit.Test;
 
@@ -43,11 +45,15 @@ public abstract class CompilerTestBase {
         null, new NoopCache());
     String code = getCompiler().compile("test.ts", new SourceFactory() {
       @Override
-      public Source getSource(String filename) throws IOException {
+      public Source getSource(String filename, String baseFilename) throws IOException {
         if (filename.equals("test.ts")) {
-          return new Source(filename, "var i: number = 5;");
+          try {
+            return new Source(new URI(filename), "var i: number = 5;");
+          } catch (URISyntaxException e) {
+            throw new IOException("Illegal filename", e);
+          }
         }
-        return cl.getSource(filename);
+        return cl.getSource(filename, baseFilename);
       }
     });
     assertEquals("var i = 5;", code.trim());

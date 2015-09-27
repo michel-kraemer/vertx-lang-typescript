@@ -17,10 +17,15 @@ package de.undercouch.vertx.lang.typescript;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.io.FilenameUtils;
 
 import de.undercouch.vertx.lang.typescript.cache.InMemoryCache;
 import de.undercouch.vertx.lang.typescript.compiler.EngineCompiler;
@@ -91,7 +96,7 @@ public class TestExamplesRunner {
       } else {
         if (f.getName().toLowerCase().endsWith(".js")) {
           if (filesToSkip == null || !containsEndsWith(filesToSkip,
-              f.getPath().replace(File.separatorChar, '/'))) {
+              FilenameUtils.separatorsToUnix(f.getPath()))) {
             result.add(f);
           }
         }
@@ -106,30 +111,44 @@ public class TestExamplesRunner {
   }
   
   private void compile(File script, TypeScriptCompiler compiler,
-      SourceFactory parentSourceFactory) throws IOException {
-    String name = script.getName().replaceFirst("\\.js$", ".ts");
+      SourceFactory parentSourceFactory, File pathToTypings) throws IOException {
+    String name = FilenameUtils.separatorsToUnix(script.getPath().replaceFirst("\\.js$", ".ts"));
     compiler.compile(name, new SourceFactory() {
       @Override
-      public Source getSource(String filename) throws IOException {
-        if (filename.equals(name)) {
+      public Source getSource(String filename, String baseFilename) throws IOException {
+        if (FilenameUtils.equalsNormalized(filename, name)) {
           Source src = Source.fromFile(script, StandardCharsets.UTF_8);
           String srcStr = src.toString();
           
+          // find all required vertx modules
+          Pattern requireVertx = Pattern.compile("var\\s+.+?=\\s*require\\s*\\(\\s*\"(vertx-.+?)\"\\s*\\)");
+          Matcher requireVertxMatcher = requireVertx.matcher(srcStr);
+          List<String> modules = new ArrayList<>();
+          modules.add("vertx-js/vertx.d.ts");
+          modules.add("vertx-js/java.d.ts");
+          while (requireVertxMatcher.find()) {
+            String mod = requireVertxMatcher.group(1);
+            modules.add(mod);
+          }
+          
           // add default type definitions
-          srcStr = "/// <reference path=\"vertx-js/vertx.d.ts\" />\n" +
-              "/// <reference path=\"vertx-js/java.d.ts\" />\n\n" + srcStr;
+          Path relPathToTypings = script.toPath().getParent().relativize(pathToTypings.toPath());
+          for (String mod : modules) {
+            srcStr = "/// <reference path=\"" + FilenameUtils.separatorsToUnix(
+                relPathToTypings.resolve(mod).toString()) + "\" />\n" + srcStr;
+          }
           
           // replace 'var x = require("...")' by 'import x = require("...")'
-          srcStr = srcStr.replaceAll("var\\s+(.+?=\\s*require\\(.+?\\))", "import $1");
+          srcStr = srcStr.replaceAll("var\\s+(.+?=\\s*require\\s*\\(.+?\\))", "import $1");
           
-          return new Source(script.getName(), srcStr);
+          return new Source(script.toURI(), srcStr);
         }
-        return parentSourceFactory.getSource(filename);
+        return parentSourceFactory.getSource(filename, baseFilename);
       }
     });
   }
   
-  public void run(File pathToExamples, List<String> dirsToSkip,
+  public void run(File pathToExamples, File pathToTypings, List<String> dirsToSkip,
       List<String> filesToSkip) throws Exception {
     this.dirsToSkip = DEFAULT_DIRS_TO_SKIP;
     if (dirsToSkip != null) {
@@ -147,7 +166,7 @@ public class TestExamplesRunner {
     if (NodeCompiler.supportsNode()) {
       System.out.println("Using NodeCompiler ...");
       compiler = new NodeCompiler();
-      run(javaScriptFiles, compiler, pathToExamples);
+      run(javaScriptFiles, compiler, pathToExamples, pathToTypings);
     }
     
     // skip EngineCompiler tests on Travis CI, because they are likely to fail
@@ -156,12 +175,12 @@ public class TestExamplesRunner {
     } else {
       System.out.println("Using EngineCompiler ...");
       compiler = new EngineCompiler();
-      run(javaScriptFiles, compiler, pathToExamples);
+      run(javaScriptFiles, compiler, pathToExamples, pathToTypings);
     }
   }
   
   private void run(List<File> javaScriptFiles, TypeScriptCompiler compiler,
-      File pathToExamples) throws Exception {
+      File pathToExamples, File pathToTypings) throws Exception {
     SourceFactory parentSourceFactory = new TypeScriptClassLoader(
         getClass().getClassLoader(), compiler, new InMemoryCache());
     
@@ -171,7 +190,7 @@ public class TestExamplesRunner {
       
       System.out.print(name + " ... ");
       try {
-        compile(f, compiler, parentSourceFactory);
+        compile(f, compiler, parentSourceFactory, pathToTypings);
       } catch (Exception e) {
         System.out.println("FAILED");
         throw e;
@@ -182,6 +201,6 @@ public class TestExamplesRunner {
   
   public static void main(String[] args) throws Exception {
     TestExamplesRunner runner = new TestExamplesRunner();
-    runner.run(new File(args[0]), null, null);
+    runner.run(new File(args[0]), new File(args[1]), null, null);
   }
 }

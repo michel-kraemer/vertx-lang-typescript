@@ -49,8 +49,8 @@ public class NodeCompiler implements TypeScriptCompiler {
   
   private String getTemporaryCompiler(SourceFactory sourceFactory) throws IOException {
     if (temporaryCompiler == null) {
-      Source tscSrc = sourceFactory.getSource(TYPESCRIPT_JS);
-      Source nodeCompilerSysSrc = sourceFactory.getSource(NODE_COMPILER_SYS_JS);
+      Source tscSrc = sourceFactory.getSource(TYPESCRIPT_JS, null);
+      Source nodeCompilerSysSrc = sourceFactory.getSource(NODE_COMPILER_SYS_JS, null);
       String tscSrcStr = tscSrc.toString();
       tscSrcStr = tscSrcStr.replaceFirst("(?m)^ts\\.executeCommandLine",
           Matcher.quoteReplacement(nodeCompilerSysSrc.toString()) + "\n$0");
@@ -90,7 +90,7 @@ public class NodeCompiler implements TypeScriptCompiler {
         String contents;
         int length;
         try {
-          src = sourceFactory.getSource(fileToRead);
+          src = sourceFactory.getSource(fileToRead, filename);
           contents = src.toString();
           length = contents.length();
         } catch (FileNotFoundException e) {

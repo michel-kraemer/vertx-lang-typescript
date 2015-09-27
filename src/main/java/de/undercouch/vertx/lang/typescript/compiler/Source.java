@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -32,9 +34,14 @@ import java.util.Base64;
  */
 public class Source {
   /**
-   * The file's name
+   * The file's name (just the basename, no path)
    */
   private final String filename;
+  
+  /**
+   * The file's URI
+   */
+  private final URI uri;
   
   /**
    * The file's contents
@@ -48,12 +55,13 @@ public class Source {
   private String digest;
   
   /**
-   * Creates a new source object
-   * @param filename the file name
+   * Creates a new source file object
+   * @param uri the file's URI
    * @param contents the file contents
    */
-  public Source(String filename, String contents) {
-    this.filename = filename;
+  public Source(URI uri, String contents) {
+    this.filename = basename(uri.toString());
+    this.uri = uri;
     this.contents = contents;
   }
   
@@ -65,9 +73,14 @@ public class Source {
    * @throws IOException if reading from the given URL failed
    */
   public static Source fromURL(URL url, Charset cs) throws IOException {
-    String filename = basename(url.getPath());
+    URI uri;
+    try {
+      uri = url.toURI();
+    } catch (URISyntaxException e) {
+      throw new IOException("Illegal URI", e);
+    }
     try (InputStream is = url.openStream()) {
-      return fromStream(is, filename, cs);
+      return fromStream(is, uri, cs);
     }
   }
   
@@ -79,24 +92,23 @@ public class Source {
    * @throws IOException if reading from the given file failed
    */
   public static Source fromFile(File f, Charset cs) throws IOException {
-    String filename = f.getName();
     try (InputStream is = new FileInputStream(f)) {
-      return fromStream(is, filename, cs);
+      return fromStream(is, f.toURI(), cs);
     }
   }
   
   /**
    * Creates a new source object from a stream. Does not close the given stream.
    * @param is the input stream to read
-   * @param filename the name of the file the new source should represent
+   * @param uri the file's URI
    * @param cs the character set to use when reading
    * @return the new source object
    * @throws IOException if reading from the given stream failed
    */
-  public static Source fromStream(InputStream is, String filename, Charset cs) throws IOException {
+  public static Source fromStream(InputStream is, URI uri, Charset cs) throws IOException {
     byte[] barr = readFully(is);
     String source = new String(barr, cs);
-    return new Source(filename, source);
+    return new Source(uri, source);
   }
   
   /**
@@ -104,6 +116,13 @@ public class Source {
    */
   public String getFilename() {
     return filename;
+  }
+  
+  /**
+   * @return the file's URI
+   */
+  public URI getURI() {
+    return uri;
   }
   
   /**
@@ -136,6 +155,7 @@ public class Source {
     int result = 1;
     result = prime * result + ((contents == null) ? 0 : contents.hashCode());
     result = prime * result + ((filename == null) ? 0 : filename.hashCode());
+    result = prime * result + ((uri == null) ? 0 : uri.hashCode());
     return result;
   }
 
@@ -167,6 +187,14 @@ public class Source {
         return false;
       }
     } else if (!filename.equals(other.filename)) {
+      return false;
+    }
+    
+    if (uri == null) {
+      if (other.uri != null) {
+        return false;
+      }
+    } else if (!uri.equals(other.uri)) {
       return false;
     }
     

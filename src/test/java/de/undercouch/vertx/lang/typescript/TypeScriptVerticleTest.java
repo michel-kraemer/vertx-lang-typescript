@@ -83,7 +83,8 @@ public class TypeScriptVerticleTest {
   }
   
   /**
-   * Tests if a simple HTTP server can be deployed
+   * Tests if a simple HTTP server can be deployed. Relies on the current
+   * working directory being the project's root.
    * @throws Exception if something goes wrong
    */
   @Test
@@ -92,7 +93,7 @@ public class TypeScriptVerticleTest {
     int port = getAvailablePort();
     JsonObject config = new JsonObject().put("port", port);
     DeploymentOptions options = new DeploymentOptions().setConfig(config);
-    vertx.deployVerticle("simpleServer.ts", options, context.asyncAssertSuccess(deploymentID -> {
+    vertx.deployVerticle("src/test/resources/simpleServer.ts", options, context.asyncAssertSuccess(deploymentID -> {
       vertx.createHttpClient().getNow(port, "localhost", "/", response -> {
         response.bodyHandler(buffer -> {
           context.assertEquals("Hello", buffer.toString());
@@ -103,7 +104,8 @@ public class TypeScriptVerticleTest {
   }
   
   /**
-   * Tests if a simple HTTP server using routing can be deployed
+   * Tests if a simple HTTP server using routing can be deployed. Relies on
+   * the current working directory being the project's root.
    * @throws Exception if something goes wrong
    */
   @Test
@@ -112,7 +114,7 @@ public class TypeScriptVerticleTest {
     int port = getAvailablePort();
     JsonObject config = new JsonObject().put("port", port);
     DeploymentOptions options = new DeploymentOptions().setConfig(config);
-    vertx.deployVerticle("routingServer.ts", options, context.asyncAssertSuccess(deploymentID -> {
+    vertx.deployVerticle("src/test/resources/routingServer.ts", options, context.asyncAssertSuccess(deploymentID -> {
       vertx.createHttpClient().getNow(port, "localhost", "/", response -> {
         response.bodyHandler(buffer -> {
           context.assertEquals("Hello Routing", buffer.toString());

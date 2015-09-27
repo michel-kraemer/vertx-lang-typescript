@@ -81,12 +81,12 @@
 @comment{"=================="}
 
 @if{type.raw.moduleName.equals("vertx")}
-/// <reference path="throwable.d.ts" />
+/// <reference path="./throwable.d.ts" />
 @else{}
 /// <reference path="../vertx-js/throwable.d.ts" />
 @end{}
 @if{ifaceSimpleName == 'Vertx'}
-/// <reference path="console.d.ts" />
+/// <reference path="./console.d.ts" />
 @end{}
 @foreach{referencedType : referencedTypes}
 /// <reference path="@{genModuleName(referencedType)}" />

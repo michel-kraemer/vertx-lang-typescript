@@ -50,7 +50,7 @@ function compileTypescript(file) {
       // use TypeScriptClassLoader to load the given file
       var body;
       try {
-        var input = __sourceFactory.getSource(filename);
+        var input = __sourceFactory.getSource(filename, file);
         body = input.toString();
       } catch (e) {
         if (e instanceof java.io.FileNotFoundException) {

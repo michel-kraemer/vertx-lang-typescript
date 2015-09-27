@@ -24,8 +24,11 @@ public interface SourceFactory {
   /**
    * Loads a source file
    * @param filename the name of the file to load
+   * @param baseFilename the name of the base file that triggers loading. This
+   * parameter is used to resolve relative filenames. It may be <code>null</code>
+   * if <code>filename</code> is absolute.
    * @return the source object
    * @throws IOException if the source file could not be loaded
    */
-  Source getSource(String filename) throws IOException;
+  Source getSource(String filename, String baseFilename) throws IOException;
 }

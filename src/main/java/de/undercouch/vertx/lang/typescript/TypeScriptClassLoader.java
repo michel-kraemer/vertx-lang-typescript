@@ -18,6 +18,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -80,18 +81,35 @@ public class TypeScriptClassLoader extends ClassLoader implements SourceFactory 
     }
   }
   
-  /**
-   * Loads a file with a given name and returns a source object. Tries
-   * to find the file in the class path and in the file system.
-   * @param name the name of the file to load
-   * @return the source object
-   * @throws IOException if the file could not be read
-   */
-  public Source getSource(String name) throws IOException {
+  @Override
+  public Source getSource(String name, String baseFilename) throws IOException {
+    if (baseFilename != null && (name.startsWith("./") || name.startsWith("../"))) {
+      // resolve relative path
+      Source baseSource = getSource(baseFilename, null);
+      if (baseSource != null) {
+        name = baseSource.getURI().resolve(name).normalize().toString();
+      }
+    }
+    
     Source result = sourceCache.get(name);
     if (result == null) {
+      // check if we've got a URL
+      URL u;
+      if (name.matches("^[a-z]+:/.*")) {
+        try {
+          u = new URL(name);
+        } catch (MalformedURLException e) {
+          // no URL, might be a Windows path instead
+          u = null;
+        }
+      } else {
+        u = null;
+      }
+      
       // search class path
-      URL u = getParent().getResource(name);
+      if (u == null) {
+        u = getParent().getResource(name);
+      }
       if (u != null) {
         result = Source.fromURL(u, StandardCharsets.UTF_8);
       }
@@ -110,14 +128,14 @@ public class TypeScriptClassLoader extends ClassLoader implements SourceFactory 
   }
   
   /**
-   * Loads a compiles a file with the given name
+   * Loads and compiles a file with the given name
    * @param name the file name
    * @return an input stream delivering the 
    * @throws IOException
    */
   private InputStream load(String name) throws IOException {
     // load file from class path or from file system
-    Source src = getSource(name);
+    Source src = getSource(name, null);
     
     // check if we have compiled the file before
     String code = codeCache.get(src);
