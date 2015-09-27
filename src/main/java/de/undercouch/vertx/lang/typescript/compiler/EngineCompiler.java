@@ -34,7 +34,7 @@ public class EngineCompiler implements TypeScriptCompiler {
   /**
    * Path to the TypeScript compiler
    */
-  private static final String TYPESCRIPT_JS = "typescript/bin/typescriptServices.js";
+  private static final String TYPESCRIPT_JS = "typescript/lib/typescriptServices.js";
   
   /**
    * Path to a helper script calling the TypeScript compiler

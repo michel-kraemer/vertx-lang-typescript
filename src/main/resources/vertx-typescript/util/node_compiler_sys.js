@@ -11,7 +11,7 @@
   ts.createCompilerHost = function(options) {
     var host = oldCreateCompilerHost(options);
     host.getDefaultLibFileName = function(options) {
-      return "typescript/bin/" + (options.target === 2 ? "lib.core.es6.d.ts" : "lib.core.d.ts");
+      return "typescript/lib/" + (options.target === 2 ? "lib.core.es6.d.ts" : "lib.core.d.ts");
     };
     return host;
   };
@@ -59,6 +59,6 @@
 
   ts.sys.getExecutingFilePath = function () {
     // virtual path to typescript compiler (i.e. where tsc.js is in the classpath)
-    return path.join("typescript/bin/", path.basename(__filename));
+    return path.join("typescript/lib/", path.basename(__filename));
   };
 })();

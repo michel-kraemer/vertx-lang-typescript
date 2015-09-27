@@ -23,11 +23,11 @@ function compileTypescript(file) {
 
   // enable commonjs modules
   opts.module = 1; // 1 = CommonJS
-
+  
   // prepare a host object that we can pass to the TypeScript compiler
   var host = {
     getDefaultLibFileName: function() {
-      return "typescript/bin/" + (opts.target === 2 ? "lib.core.es6.d.ts" : "lib.core.d.ts");
+      return "typescript/lib/" + (opts.target === 2 ? "lib.core.es6.d.ts" : "lib.core.d.ts");
     },
 
     getCurrentDirectory: function() {
@@ -69,6 +69,16 @@ function compileTypescript(file) {
 
     writeFile: function(filename, data, writeByteOrderMark, onError) {
       output += data;
+    },
+    
+    fileExists: function(filename) {
+      // use TypeScriptClassLoader and try to load the given file
+      try {
+        __sourceFactory.getSource(filename, file);
+      } catch (e) {
+        return false;
+      }
+      return true;
     }
   };
   

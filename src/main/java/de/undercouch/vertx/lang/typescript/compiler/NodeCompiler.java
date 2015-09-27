@@ -35,7 +35,7 @@ public class NodeCompiler implements TypeScriptCompiler {
   /**
    * Path to the TypeScript compiler
    */
-  private static final String TYPESCRIPT_JS = "typescript/bin/tsc.js";
+  private static final String TYPESCRIPT_JS = "typescript/lib/tsc.js";
   
   /**
    * Path to a script setting a special system for the TypeScript compiler.
