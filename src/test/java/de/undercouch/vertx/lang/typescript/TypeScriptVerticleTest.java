@@ -49,6 +49,9 @@ public class TypeScriptVerticleTest {
   @Parameterized.Parameters
   public static Iterable<Boolean> useNodeCompiler() {
     if (NodeCompiler.supportsNode()) {
+      if (Boolean.parseBoolean(System.getenv("TRAVIS"))) {
+        return Arrays.asList(true);
+      }
       return Arrays.asList(true, false);
     } else {
       return Arrays.asList(false);
