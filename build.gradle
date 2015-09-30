@@ -90,19 +90,6 @@ task packageSources(type: Jar) {
     classifier = 'sources'
 }
 
-// define artifacts for upload
-artifacts {
-    archives jar
-    archives packageJavadoc
-    archives packageSources
-}
-
-// sign all artifacts
-signing {
-    required { gradle.taskGraph.hasTask(uploadArchives) }
-    sign configurations.archives
-}
-
 // remove test dependencies from configuration-to-scope mapping
 // this also removes them from the maven pom file
 conf2ScopeMappings.mappings.remove(configurations.testCompile)
@@ -224,9 +211,30 @@ task copyRequiredResources(type: Copy, dependsOn: [copyTypeDefinitions, npmInsta
     into 'src-gen/main/resources/typescript'
 }
 
+task typeDefinitionsZip(type: Zip, dependsOn: copyTypeDefinitions) {
+    from new File(buildDir, 'typings')
+    classifier = 'typings'
+}
+
+// define artifacts for upload
+artifacts {
+    archives jar
+    archives packageJavadoc
+    archives packageSources
+    archives typeDefinitionsZip
+}
+
+// sign all artifacts
+signing {
+    required { gradle.taskGraph.hasTask(uploadArchives) }
+    sign configurations.archives
+}
+
 processResources.dependsOn(copyRequiredResources)
 
 eclipseClasspath.dependsOn(processResources)
+
+assemble.dependsOn(typeDefinitionsZip)
 
 task downloadExamples(type: Download) {
     src "https://github.com/vert-x3/vertx-examples/archive/${vertxExamplesSHA}.zip"
