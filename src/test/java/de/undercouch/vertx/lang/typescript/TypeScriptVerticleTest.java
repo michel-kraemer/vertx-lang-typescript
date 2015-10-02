@@ -85,6 +85,21 @@ public class TypeScriptVerticleTest {
     }
   }
   
+  private void doTest(String verticle, String message, TestContext context) throws IOException {
+    Async async = context.async();
+    int port = getAvailablePort();
+    JsonObject config = new JsonObject().put("port", port);
+    DeploymentOptions options = new DeploymentOptions().setConfig(config);
+    vertx.deployVerticle(verticle, options, context.asyncAssertSuccess(deploymentID -> {
+      vertx.createHttpClient().getNow(port, "localhost", "/", response -> {
+        response.bodyHandler(buffer -> {
+          context.assertEquals(message, buffer.toString());
+          vertx.undeploy(deploymentID, context.asyncAssertSuccess(r -> async.complete()));
+        });
+      });
+    }));
+  }
+  
   /**
    * Tests if a simple HTTP server can be deployed. Relies on the current
    * working directory being the project's root.
@@ -92,18 +107,7 @@ public class TypeScriptVerticleTest {
    */
   @Test
   public void simpleServer(TestContext context) throws Exception {
-    Async async = context.async();
-    int port = getAvailablePort();
-    JsonObject config = new JsonObject().put("port", port);
-    DeploymentOptions options = new DeploymentOptions().setConfig(config);
-    vertx.deployVerticle("src/test/resources/simpleServer.ts", options, context.asyncAssertSuccess(deploymentID -> {
-      vertx.createHttpClient().getNow(port, "localhost", "/", response -> {
-        response.bodyHandler(buffer -> {
-          context.assertEquals("Hello", buffer.toString());
-          vertx.undeploy(deploymentID, context.asyncAssertSuccess(r -> async.complete()));
-        });
-      });
-    }));
+    doTest("src/test/resources/simpleServer.ts", "Hello", context);
   }
   
   /**
@@ -113,17 +117,16 @@ public class TypeScriptVerticleTest {
    */
   @Test
   public void routingServer(TestContext context) throws Exception {
-    Async async = context.async();
-    int port = getAvailablePort();
-    JsonObject config = new JsonObject().put("port", port);
-    DeploymentOptions options = new DeploymentOptions().setConfig(config);
-    vertx.deployVerticle("src/test/resources/routingServer.ts", options, context.asyncAssertSuccess(deploymentID -> {
-      vertx.createHttpClient().getNow(port, "localhost", "/", response -> {
-        response.bodyHandler(buffer -> {
-          context.assertEquals("Hello Routing", buffer.toString());
-          vertx.undeploy(deploymentID, context.asyncAssertSuccess(r -> async.complete()));
-        });
-      });
-    }));
+    doTest("src/test/resources/routingServer.ts", "Hello Routing", context);
+  }
+  
+  /**
+   * Tests if a simple HTTP server using modules can be deployed. Relies on
+   * the current working directory being the project's root.
+   * @throws Exception if something goes wrong
+   */
+  @Test
+  public void moduleServer(TestContext context) throws Exception {
+    doTest("src/test/resources/moduleServer.ts", "Hello Module", context);
   }
 }

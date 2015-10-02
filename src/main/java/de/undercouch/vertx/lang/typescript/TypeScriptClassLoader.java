@@ -73,8 +73,13 @@ public class TypeScriptClassLoader extends ClassLoader implements SourceFactory 
         return load(name.substring(0, name.length() - 3));
       }
       
-      // load other files directly
-      return super.getResourceAsStream(name);
+      // try to load other files directly
+      InputStream r = super.getResourceAsStream(name);
+      if (r == null && lowerName.endsWith(".js")) {
+        // try to load .ts file instead
+        return load(name.substring(0, name.length() - 3) + ".ts");
+      }
+      return r;
     } catch (IOException e) {
       // according to the interface
       return null;
