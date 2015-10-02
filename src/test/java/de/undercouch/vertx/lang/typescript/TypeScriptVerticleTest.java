@@ -14,6 +14,16 @@
 
 package de.undercouch.vertx.lang.typescript;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.util.Arrays;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
+import de.undercouch.vertx.lang.typescript.compiler.NodeCompiler;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -21,18 +31,6 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunnerWithParametersFactory;
-
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.util.Arrays;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
-import de.undercouch.vertx.lang.typescript.compiler.NodeCompiler;
 
 /**
  * Tests various verticles written in TypeScript
@@ -43,8 +41,6 @@ import de.undercouch.vertx.lang.typescript.compiler.NodeCompiler;
 public class TypeScriptVerticleTest {
   @Rule
   public RunTestOnContext runTestOnContext = new RunTestOnContext();
-  
-  private Vertx vertx;
   
   @Parameterized.Parameters
   public static Iterable<Boolean> useNodeCompiler() {
@@ -61,11 +57,6 @@ public class TypeScriptVerticleTest {
   public TypeScriptVerticleTest(boolean useNodeCompiler) {
     System.setProperty(TypeScriptVerticleFactory.PROP_NAME_DISABLE_NODE_COMPILER,
         String.valueOf(!useNodeCompiler));
-  }
-  
-  @Before
-  public void before(TestContext context) {
-    vertx = Vertx.vertx();
   }
   
   /**
@@ -90,6 +81,7 @@ public class TypeScriptVerticleTest {
     int port = getAvailablePort();
     JsonObject config = new JsonObject().put("port", port);
     DeploymentOptions options = new DeploymentOptions().setConfig(config);
+    Vertx vertx = runTestOnContext.vertx();
     vertx.deployVerticle(verticle, options, context.asyncAssertSuccess(deploymentID -> {
       vertx.createHttpClient().getNow(port, "localhost", "/", response -> {
         response.bodyHandler(buffer -> {

@@ -16,7 +16,6 @@ package de.undercouch.vertx.lang.typescript;
 
 import java.util.Arrays;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,8 +38,6 @@ public class ModuleTest {
   @Rule
   public RunTestOnContext runTestOnContext = new RunTestOnContext();
   
-  private Vertx vertx;
-  
   @Parameterized.Parameters
   public static Iterable<Boolean> useNodeCompiler() {
     if (NodeCompiler.supportsNode()) {
@@ -58,11 +55,6 @@ public class ModuleTest {
         String.valueOf(!useNodeCompiler));
   }
   
-  @Before
-  public void before(TestContext context) {
-    vertx = Vertx.vertx();
-  }
-  
   /**
    * Tests if a simple HTTP server can be deployed. Relies on the current
    * working directory being the project's root.
@@ -71,6 +63,7 @@ public class ModuleTest {
   @Test
   public void simpleModule(TestContext context) throws Exception {
     Async async = context.async();
+    Vertx vertx = runTestOnContext.vertx();
     vertx.deployVerticle("moduleTest.ts", context.asyncAssertSuccess(deploymentID -> {
       vertx.undeploy(deploymentID, context.asyncAssertSuccess(r -> async.complete()));
     }));
