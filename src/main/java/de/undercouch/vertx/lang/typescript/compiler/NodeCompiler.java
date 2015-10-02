@@ -104,6 +104,20 @@ public class NodeCompiler implements TypeScriptCompiler {
         pw.append(' ');
         pw.append(contents);
         pw.flush();
+      } else if (line.startsWith("VERTX_TYPESCRIPT_FILEEXISTS")) {
+        // compiler wants us to find a file
+        String fileToRead = line.substring("VERTX_TYPESCRIPT_FILEEXISTS".length());
+        boolean found;
+        try {
+          sourceFactory.getSource(fileToRead, filename);
+          found = true;
+        } catch (FileNotFoundException e) {
+          found = false;
+        }
+        
+        // send 0 (false) or 1 (true)
+        pw.append(found ? '1' : '0');
+        pw.flush();
       } else {
         out.append(line + "\n");
       }

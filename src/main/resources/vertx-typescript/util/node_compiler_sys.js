@@ -13,6 +13,16 @@
     host.getDefaultLibFileName = function(options) {
       return "typescript/lib/" + (options.target === 2 ? "lib.core.es6.d.ts" : "lib.core.d.ts");
     };
+    host.fileExists = function(path) {
+      // send tag and filename to parent process
+      fs.writeSync(process.stdout.fd, "VERTX_TYPESCRIPT_FILEEXISTS" + path + "\n");
+      var buf = new Buffer(1);
+      var res = fs.readSync(process.stdin.fd, buf, 0, 1);
+      if (res != 1) {
+        throw new Error("Could not read boolean from input stream");
+      }
+      return !!parseInt(buf.toString());
+    };
     return host;
   };
 
@@ -57,7 +67,7 @@
     fs.writeSync(process.stdout.fd, data);
   };
 
-  ts.sys.getExecutingFilePath = function () {
+  ts.sys.getExecutingFilePath = function() {
     // virtual path to typescript compiler (i.e. where tsc.js is in the classpath)
     return path.join("typescript/lib/", path.basename(__filename));
   };
