@@ -1,7 +1,7 @@
 TypeScript for Vert.x 3.1 (or higher) [![Build Status](https://travis-ci.org/michel-kraemer/vertx-lang-typescript.svg?branch=master)](https://travis-ci.org/michel-kraemer/vertx-lang-typescript)
 =====================================
 
-This library adds TypeScript support to [Vert.x 3.1](http://vertx.io) or higher.
+This library adds TypeScript 1.6 support to [Vert.x 3.1](http://vertx.io) or higher.
 
 Usage
 -----
