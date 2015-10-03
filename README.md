@@ -1,16 +1,21 @@
-Vert.x 3.0 TypeScript Support [![Build Status](https://travis-ci.org/michel-kraemer/vertx-lang-typescript.svg?branch=master)](https://travis-ci.org/michel-kraemer/vertx-lang-typescript)
-=============================
+TypeScript for Vert.x 3.1 (or higher) [![Build Status](https://travis-ci.org/michel-kraemer/vertx-lang-typescript.svg?branch=master)](https://travis-ci.org/michel-kraemer/vertx-lang-typescript)
+=====================================
 
-This library adds TypeScript support to [Vert.x 3.0](http://vertx.io).
+This library adds TypeScript support to [Vert.x 3.1](http://vertx.io) or higher.
 
 Usage
 -----
 
-The library registers a new factory for verticles written in TypeScript. Just
-add the library to your class path and you're done. Files with a name ending
+The library registers a new factory for verticles written in TypeScript. **Just
+add the library to your class path and you're done**. Files with a name ending
 in `.ts` will automatically be compiled to JavaScript when they are executed.
 
-The library also contains the type definitions for the Vert.x JavaScript API.
+[Type definitions](https://oss.sonatype.org/content/repositories/snapshots/de/undercouch/vertx-lang-typescript/1.0.0-SNAPSHOT/)
+for the Vert.x JavaScript API are also provided. Use them in your
+favourite TypeScript editor to get **auto-completion**, **API documentation** and
+**meaningful error messages**.
+
+<img src="https://raw.githubusercontent.com/michel-kraemer/vertx-lang-typescript/cf2cc49d3d8b65adff4fb3d66e4fb9faaae74135/screencast.gif">
 
 ### Add to local Vert.x installation
 
@@ -65,7 +70,7 @@ Example
 The following script creates an HTTP server:
 
 ```typescript
-/// <reference path="vertx-js/vertx.d.ts" />
+/// <reference path="./typings/vertx-js/vertx.d.ts" />
 
 vertx.createHttpServer().requestHandler(req => {
   req.response().putHeader("Content-Type", "text/html").end("Hello");
@@ -146,7 +151,7 @@ Perform a full build with
 ./gradlew build
 ```
 
-Just as Vert.x 3.0 the library requires Java 8.
+Just as Vert.x 3.x the library requires Java 8.
 
 License
 -------
