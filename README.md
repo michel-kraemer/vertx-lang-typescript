@@ -15,7 +15,7 @@ for the Vert.x JavaScript API are also provided (`vertx-lang-typescript-x.x.x-ty
 favourite TypeScript editor to get **auto-completion**, **API documentation** and
 **meaningful error messages**.
 
-<img src="https://raw.githubusercontent.com/michel-kraemer/vertx-lang-typescript/cf2cc49d3d8b65adff4fb3d66e4fb9faaae74135/screencast.gif">
+<img src="https://raw.githubusercontent.com/michel-kraemer/vertx-lang-typescript/aaa67228c998bf9dc64b5f45fb407ef56169efec/screencast.gif">
 
 ### Add to local Vert.x installation
 
