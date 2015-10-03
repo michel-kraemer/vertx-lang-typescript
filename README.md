@@ -10,8 +10,8 @@ The library registers a new factory for verticles written in TypeScript. **Just
 add the library to your class path and you're done**. Files with a name ending
 in `.ts` will automatically be compiled to JavaScript when they are executed.
 
-[Type definitions](https://oss.sonatype.org/content/repositories/snapshots/de/undercouch/vertx-lang-typescript/1.0.0-SNAPSHOT/)
-for the Vert.x JavaScript API are also provided. Use them in your
+[Type definitions](https://github.com/michel-kraemer/vertx-lang-typescript/releases/)
+for the Vert.x JavaScript API are also provided (`vertx-lang-typescript-x.x.x-typings.zip`). Use them in your
 favourite TypeScript editor to get **auto-completion**, **API documentation** and
 **meaningful error messages**.
 
@@ -19,7 +19,7 @@ favourite TypeScript editor to get **auto-completion**, **API documentation** an
 
 ### Add to local Vert.x installation
 
-Download the [library's main jar](https://oss.sonatype.org/content/repositories/snapshots/de/undercouch/vertx-lang-typescript/1.0.0-SNAPSHOT/)
+[Download the library's main jar](https://github.com/michel-kraemer/vertx-lang-typescript/releases/) (`vertx-lang-typescript-x.x.x.jar`)
 and put it into the `lib` folder of your local Vert.x installation. It will be automatically
 added to the classpath by the Vert.x start script.
 
