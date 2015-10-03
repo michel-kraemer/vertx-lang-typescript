@@ -56,6 +56,10 @@ dependencies {
     vertx group: 'io.vertx', name: 'vertx-service-proxy', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-sql-common', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-web', version: vertxVersion, classifier: 'sources'
+    vertx group: 'io.vertx', name: 'vertx-web-templ-thymeleaf', version: vertxVersion, classifier: 'sources'
+    vertx group: 'io.vertx', name: 'vertx-web-templ-handlebars', version: vertxVersion, classifier: 'sources'
+    vertx group: 'io.vertx', name: 'vertx-web-templ-jade', version: vertxVersion, classifier: 'sources'
+    vertx group: 'io.vertx', name: 'vertx-web-templ-mvel', version: vertxVersion, classifier: 'sources'
 
     codegen "io.vertx:vertx-auth-shiro:$vertxVersion"
     codegen "io.vertx:vertx-core:$vertxVersion"
