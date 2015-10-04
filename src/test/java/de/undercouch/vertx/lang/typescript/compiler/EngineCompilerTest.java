@@ -28,8 +28,8 @@ public class EngineCompilerTest extends CompilerTestBase {
 
   @Before
   public void beforeMethod() {
-    // skip EngineCompiler tests on Travis CI, because they are likely to fail
-    org.junit.Assume.assumeTrue(!Boolean.parseBoolean(System.getenv("TRAVIS")));
+    // skip EngineCompiler tests on Circle CI, because they are likely to time out
+    org.junit.Assume.assumeTrue(System.getenv("CIRCLE_BUILD_NUM") != null);
   }
 
   @Override

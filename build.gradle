@@ -268,4 +268,10 @@ task testExamples(dependsOn: [ unzipExamples, testClasses ]) << {
     runner.run(new File(examplesDir, "web-examples"), typingsDir, null, null)
 }
 
+test { 
+    forkEvery = 1 
+    maxParallelForks = 1
+    maxHeapSize = '512m'
+}
+
 test.dependsOn(testExamples)

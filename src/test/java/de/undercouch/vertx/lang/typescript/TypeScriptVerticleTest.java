@@ -45,7 +45,8 @@ public class TypeScriptVerticleTest {
   @Parameterized.Parameters
   public static Iterable<Boolean> useNodeCompiler() {
     if (NodeCompiler.supportsNode()) {
-      if (Boolean.parseBoolean(System.getenv("TRAVIS"))) {
+      // skip EngineCompiler tests on Circle CI, because they are likely to time out
+      if (System.getenv("CIRCLE_BUILD_NUM") != null) {
         return Arrays.asList(true);
       }
       return Arrays.asList(true, false);
