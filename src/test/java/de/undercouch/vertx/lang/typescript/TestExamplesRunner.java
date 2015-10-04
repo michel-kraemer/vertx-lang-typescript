@@ -75,6 +75,23 @@ public class TestExamplesRunner {
   private Set<String> dirsToSkip;
   private Set<String> filesToSkip;
   
+  private TypeScriptCompiler nodeCompiler;
+  private TypeScriptCompiler engineCompiler;
+  
+  private TypeScriptCompiler getNodeCompiler() {
+    if (nodeCompiler == null) {
+      nodeCompiler = new NodeCompiler();
+    }
+    return nodeCompiler;
+  }
+  
+  private TypeScriptCompiler getEngineCompiler() {
+    if (engineCompiler == null) {
+      engineCompiler = new EngineCompiler();
+    }
+    return engineCompiler;
+  }
+  
   private boolean containsEndsWith(Set<String> haystack, String needle) {
     for (String s : haystack) {
       if (needle.endsWith(s)) {
@@ -165,7 +182,7 @@ public class TestExamplesRunner {
     
     if (NodeCompiler.supportsNode()) {
       System.out.println("Using NodeCompiler ...");
-      compiler = new NodeCompiler();
+      compiler = getNodeCompiler();
       run(javaScriptFiles, compiler, pathToExamples, pathToTypings);
     }
     
@@ -174,7 +191,7 @@ public class TestExamplesRunner {
       System.out.println("Travis CI environment detected. Skipping EngineCompiler tests.");
     } else {
       System.out.println("Using EngineCompiler ...");
-      compiler = new EngineCompiler();
+      compiler = getEngineCompiler();
       run(javaScriptFiles, compiler, pathToExamples, pathToTypings);
     }
   }
