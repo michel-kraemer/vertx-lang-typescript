@@ -206,13 +206,14 @@ public class TestExamplesRunner {
       name = name.substring(pathToExamples.getAbsolutePath().length() + 1);
       
       System.out.print(name + " ... ");
+      long start = System.currentTimeMillis();
       try {
         compile(f, compiler, parentSourceFactory, pathToTypings);
       } catch (Exception e) {
-        System.out.println("FAILED");
+        System.out.println("FAILED (" + (System.currentTimeMillis() - start) + " ms)");
         throw e;
       }
-      System.out.println("OK");
+      System.out.println("OK (" + (System.currentTimeMillis() - start) + " ms)");
     }
   }
   
