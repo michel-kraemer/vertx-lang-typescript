@@ -15,9 +15,10 @@
 /**
  * Compile a TypeScript file to JavaScript
  * @param file the name of the file to compile
+ * @param sourceFactory a factory that loads source files
  * @returns {String} the generated JavaScript code
  */
-function compileTypescript(file) {
+function compileTypescript(file, sourceFactory) {
   var output = "";
   var opts = ts.getDefaultCompilerOptions();
 
@@ -50,7 +51,7 @@ function compileTypescript(file) {
       // use TypeScriptClassLoader to load the given file
       var body;
       try {
-        var input = __sourceFactory.getSource(filename, file);
+        var input = sourceFactory.getSource(filename, file);
         body = input.toString();
       } catch (e) {
         if (e instanceof java.io.FileNotFoundException) {
@@ -74,7 +75,7 @@ function compileTypescript(file) {
     fileExists: function(filename) {
       // use TypeScriptClassLoader and try to load the given file
       try {
-        __sourceFactory.getSource(filename, file);
+        sourceFactory.getSource(filename, file);
       } catch (e) {
         return false;
       }

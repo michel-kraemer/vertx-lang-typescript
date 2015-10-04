@@ -19,11 +19,11 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 
-import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import javax.script.SimpleBindings;
+
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 /**
  * Compiles TypeScript sources with the TypeScript compiler hosted by a
@@ -119,13 +119,8 @@ public class EngineCompiler implements TypeScriptCompiler {
   
   @Override
   public String compile(String filename, SourceFactory sourceFactory) throws IOException {
-    try {
-      ScriptEngine e = getEngine();
-      SimpleBindings bindings = new SimpleBindings(e.getBindings(ScriptContext.ENGINE_SCOPE));
-      bindings.put("__sourceFactory", sourceFactory);
-      return (String)e.eval("compileTypescript('" + filename + "');", bindings);
-    } catch (ScriptException e) {
-      throw new IllegalStateException("Could not compile \"" + filename + "\"", e);
-    }
+    ScriptEngine e = getEngine();
+    ScriptObjectMirror o = (ScriptObjectMirror)e.get("compileTypescript");
+    return (String)o.call(null, filename, sourceFactory);
   }
 }
