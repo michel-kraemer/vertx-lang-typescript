@@ -20,6 +20,7 @@ import java.util.Arrays;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -41,6 +42,9 @@ import io.vertx.ext.unit.junit.VertxUnitRunnerWithParametersFactory;
 public class TypeScriptVerticleTest {
   @Rule
   public RunTestOnContext runTestOnContext = new RunTestOnContext();
+
+  @Rule
+  public Timeout globalTimeout = Timeout.seconds(60 * 10); // 10 minutes (for the really slow CI server)
   
   @Parameterized.Parameters
   public static Iterable<Boolean> useNodeCompiler() {
