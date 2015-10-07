@@ -11,7 +11,7 @@ add the library to your class path and you're done**. Files with a name ending
 in `.ts` will automatically be compiled to JavaScript when they are executed.
 
 [Type definitions](https://github.com/michel-kraemer/vertx-lang-typescript/releases/)
-for the Vert.x JavaScript API are also provided (`vertx-lang-typescript-x.x.x-typings.zip`). Use them in your
+for the Vert.x JavaScript API are also provided (`vertx-lang-typescript-1.0.0-typings.zip`). Use them in your
 favourite TypeScript editor to get **auto-completion**, **API documentation** and
 **meaningful error messages**.
 
@@ -19,7 +19,7 @@ favourite TypeScript editor to get **auto-completion**, **API documentation** an
 
 ### Add to local Vert.x installation
 
-[Download the library's main jar](https://github.com/michel-kraemer/vertx-lang-typescript/releases/) (`vertx-lang-typescript-x.x.x.jar`)
+[Download the library's main jar](https://github.com/michel-kraemer/vertx-lang-typescript/releases/) (`vertx-lang-typescript-1.0.0.jar`)
 and put it into the `lib` folder of your local Vert.x installation. It will be automatically
 added to the classpath by the Vert.x start script.
 
@@ -29,38 +29,18 @@ If your application's build is based on **Maven** add the following lines to you
 `pom.xml`:
 
 ```xml
-<repositories>
-    <repository>
-        <id>sonatype-nexus-snapshots</id>
-        <name>Sonatype Nexus Snapshots</name>
-        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        <releases>
-            <enabled>false</enabled>
-        </releases>
-        <snapshots>
-            <enabled>true</enabled>
-        </snapshots>
-    </repository>
-</repositories>
-
 <dependency>
     <groupId>de.undercouch</groupId>
     <artifactId>vertx-lang-typescript</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 
 If you use **Gradle** add the following to your `build.gradle`:
 
 ```gradle
-repositories {
-    maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots'
-    }
-}
-
 dependencies {
-    compile 'de.undercouch:vertx-lang-typescript:1.0.0-SNAPSHOT'
+    compile 'de.undercouch:vertx-lang-typescript:1.0.0'
 }
 ```
 
