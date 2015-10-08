@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Arrays;
 
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +28,8 @@ import de.undercouch.vertx.lang.typescript.compiler.NodeCompiler;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
@@ -40,11 +43,18 @@ import io.vertx.ext.unit.junit.VertxUnitRunnerWithParametersFactory;
 @RunWith(Parameterized.class)
 @Parameterized.UseParametersRunnerFactory(VertxUnitRunnerWithParametersFactory.class)
 public class TypeScriptVerticleTest {
+  private Logger log = LoggerFactory.getLogger(TypeScriptVerticleTest.class);
+  
   @Rule
   public RunTestOnContext runTestOnContext = new RunTestOnContext();
 
   @Rule
   public Timeout globalTimeout = Timeout.seconds(60 * 10); // 10 minutes (for the really slow CI server)
+  
+  @BeforeClass
+  public static void setUpClass() {
+    System.setProperty(TypeScriptVerticleFactory.PROP_NAME_SHARE_COMPILER, "true");
+  }
   
   @Parameterized.Parameters
   public static Iterable<Boolean> useNodeCompiler() {

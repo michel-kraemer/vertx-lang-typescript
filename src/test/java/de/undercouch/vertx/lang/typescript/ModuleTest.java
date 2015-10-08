@@ -16,6 +16,7 @@ package de.undercouch.vertx.lang.typescript;
 
 import java.util.Arrays;
 
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,6 +38,11 @@ import io.vertx.ext.unit.junit.VertxUnitRunnerWithParametersFactory;
 public class ModuleTest {
   @Rule
   public RunTestOnContext runTestOnContext = new RunTestOnContext();
+  
+  @BeforeClass
+  public static void setUpClass() {
+    System.setProperty(TypeScriptVerticleFactory.PROP_NAME_SHARE_COMPILER, "true");
+  }
   
   @Parameterized.Parameters
   public static Iterable<Boolean> useNodeCompiler() {

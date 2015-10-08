@@ -22,6 +22,7 @@ import io.vertx.core.spi.VerticleFactory;
 import io.vertx.lang.js.JSVerticleFactory;
 
 import java.io.File;
+import java.util.concurrent.atomic.AtomicReference;
 
 import de.undercouch.vertx.lang.typescript.cache.Cache;
 import de.undercouch.vertx.lang.typescript.cache.DiskCache;
@@ -52,6 +53,12 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
    * should not be used even if Node.js is available.
    */
   public static final String PROP_NAME_DISABLE_NODE_COMPILER = "vertx.disableNodeCompiler";
+  
+  /**
+   * The name of the system property specifying that multiple instances of the
+   * factory should share the same TypeScript compiler.
+   */
+  public static final String PROP_NAME_SHARE_COMPILER = "vertx.typescriptShareCompiler";
   
   /**
    * Do not cache compiled sources (default)
@@ -112,6 +119,20 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
   private TypeScriptCompiler compiler;
   
   /**
+   * An instance of {@link NodeCompiler} shared amongst multiple instances of
+   * the factory. Only set if the {@link #PROP_NAME_SHARE_COMPILER} property
+   * is <code>true</code>.
+   */
+  private static AtomicReference<NodeCompiler> sharedNodeCompiler = new AtomicReference<>();
+  
+  /**
+   * An instance of {@link EngineCompiler} shared amongst multiple instances of
+   * the factory. Only set if the {@link #PROP_NAME_SHARE_COMPILER} property
+   * is <code>true</code>.
+   */
+  private static AtomicReference<EngineCompiler> sharedEngineCompiler = new AtomicReference<>();
+  
+  /**
    * Default constructor
    */
   public TypeScriptVerticleFactory() {
@@ -140,10 +161,33 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
   private TypeScriptCompiler getTypeScriptCompiler() {
     boolean disableNodeCompiler = Boolean.getBoolean(PROP_NAME_DISABLE_NODE_COMPILER);
     if (compiler == null) {
+      boolean share = Boolean.getBoolean(PROP_NAME_SHARE_COMPILER);
       if (!disableNodeCompiler && NodeCompiler.supportsNode()) {
-        compiler = new NodeCompiler();
+        if (share) {
+          NodeCompiler nc = sharedNodeCompiler.get();
+          if (nc == null) {
+            nc = new NodeCompiler();
+            if (!sharedNodeCompiler.compareAndSet(null, nc)) {
+              nc = sharedNodeCompiler.get();
+            }
+          }
+          compiler = nc;
+        } else {
+          compiler = new NodeCompiler();
+        }
       } else {
-        compiler = new EngineCompiler();
+        if (share) {
+          EngineCompiler ec = sharedEngineCompiler.get();
+          if (ec == null) {
+            ec = new EngineCompiler();
+            if (!sharedEngineCompiler.compareAndSet(null, ec)) {
+              ec = sharedEngineCompiler.get();
+            }
+          }
+          compiler = ec;
+        } else {
+          compiler = new EngineCompiler();
+        }
       }
     }
     return compiler;
