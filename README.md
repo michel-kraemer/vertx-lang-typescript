@@ -1,4 +1,4 @@
-TypeScript for Vert.x 3.1 (or higher) [![Circle CI](https://circleci.com/gh/michel-kraemer/vertx-lang-typescript/tree/master.svg?style=svg)](https://circleci.com/gh/michel-kraemer/vertx-lang-typescript/tree/master)
+TypeScript for Vert.x 3.1 (or higher)
 =====================================
 
 This library adds TypeScript 1.6 support to [Vert.x 3.1](http://vertx.io) or higher.
