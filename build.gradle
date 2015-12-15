@@ -1,5 +1,5 @@
 plugins {
-    id 'com.moowork.node' version '0.10'
+    id 'com.moowork.node' version '0.11'
     id 'de.undercouch.download' version '2.0.0'
 }
 
@@ -148,8 +148,8 @@ uploadArchives {
 }
 
 node {
-    version = '0.12.4'
-    npmVersion = '2.1.6'
+    version = '5.2.0'
+    npmVersion = '3.3.12'
     download = true
 }
 
