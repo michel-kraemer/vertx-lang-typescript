@@ -103,11 +103,8 @@ declare module "@{type.raw.moduleName}-js/@{helper.convertCamelCaseToUnderscores
  */@end{}
 interface @{ifaceSimpleName}
 
-@if{concreteSuperTypes.size() > 0}
-  extends
-  @foreach{concreteSuperType: concreteSuperTypes}
-    @{genTSType(concreteSuperType)}
-  @end{}
+@if{concreteSuperType != null}
+  extends @{genTSType(concreteSuperType)}
 @end{}
 
 @if{abstractSuperTypes.size() > 0}

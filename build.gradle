@@ -16,8 +16,8 @@ sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 ext {
-    vertxVersion = '3.1.0'
-    vertxExamplesSHA = '6a31a51d85707f0471cf80cbaa6b21265a2f754e'
+    vertxVersion = '3.2.0'
+    vertxExamplesSHA = '11f28269f8dd0c8e880b6443bc03eebaa5af57e7'
 }
 
 repositories {
@@ -44,6 +44,7 @@ dependencies {
     vertx group: 'io.vertx', name: 'vertx-auth-common', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-auth-jdbc', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-auth-jwt', version: vertxVersion, classifier: 'sources'
+    vertx group: 'io.vertx', name: 'vertx-auth-oauth2', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-auth-shiro', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-core', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-dropwizard-metrics', version: vertxVersion, classifier: 'sources'
@@ -54,6 +55,7 @@ dependencies {
     vertx group: 'io.vertx', name: 'vertx-redis-client', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-rx-java', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-service-proxy', version: vertxVersion, classifier: 'sources'
+    vertx group: 'io.vertx', name: 'vertx-shell', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-sql-common', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-web', version: vertxVersion, classifier: 'sources'
     vertx group: 'io.vertx', name: 'vertx-web-templ-thymeleaf', version: vertxVersion, classifier: 'sources'
@@ -69,13 +71,17 @@ dependencies {
     codegen "io.vertx:vertx-mongo:$vertxVersion"
     codegen "io.vertx:vertx-web:$vertxVersion"
 
-    codegen 'com.github.jknack:handlebars:1.3.0'
-    codegen 'de.neuland-bfi:jade4j:0.4.0'
-    codegen 'io.dropwizard.metrics:metrics-core:3.1.0'
-    codegen 'io.reactivex:rxjava:1.0.0-rc.3'
-    codegen 'log4j:log4j:1.2.16'
-    codegen 'org.slf4j:slf4j-api:1.6.2'
-    codegen 'org.thymeleaf:thymeleaf:2.1.2.RELEASE'
+    codegen 'com.github.jknack:handlebars:4.0.1'
+    codegen 'com.jolbox:bonecp:0.8.0.RELEASE'
+    codegen 'com.zaxxer:HikariCP:2.4.3'
+    codegen 'de.neuland-bfi:jade4j:1.1.3'
+    codegen 'io.dropwizard.metrics:metrics-core:3.1.2'
+    codegen 'io.reactivex:rxjava:1.1.0'
+    codegen 'io.termd:termd-core:1.0.1'
+    codegen 'log4j:log4j:1.2.17'
+    codegen 'org.apache.sshd:sshd-core:1.0.0'
+    codegen 'org.slf4j:slf4j-api:1.7.13'
+    codegen 'org.thymeleaf:thymeleaf:2.1.4.RELEASE'
 }
 
 task wrapper(type: Wrapper) {

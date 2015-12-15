@@ -61,7 +61,7 @@ public class TestExamplesRunner {
     DEFAULT_DIRS_TO_SKIP.add("webroot");
     
     // we don't support the eventbus-client yet
-    DEFAULT_FILES_TO_SKIP.add("web/vertxbus/node/index.js");
+    DEFAULT_DIRS_TO_SKIP.add("vertxbus");
     
     // this example calls RoutingContext.fail() with a Throwable object
     // instead of a status code (number)
