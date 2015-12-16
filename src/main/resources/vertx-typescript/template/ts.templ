@@ -14,6 +14,8 @@
     String sn = helper.convertCamelCaseToUnderscores(moduleType.raw.simpleName);
     if (!type.raw.moduleName.equals(moduleType.raw.moduleName)) {
       sn = "../" + moduleType.raw.moduleName + "-js/" + sn;
+    } else {
+      sn = "./" + sn;
     }
     return sn + '.d.ts';
   }
