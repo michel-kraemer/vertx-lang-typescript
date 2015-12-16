@@ -153,7 +153,6 @@ interface @{genSimpleNameFromName(type, ifaceSimpleName)}
 @end{}
 
 declare var @{genSimpleNameFromName(type, ifaceSimpleName)}: {
-  new(): @{ifaceSimpleName};
 @if{hasStaticMethods}
 @foreach{method:methods}
   @includeNamed{'genMethod';static=true}
