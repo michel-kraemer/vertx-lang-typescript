@@ -271,6 +271,7 @@ task testExamples(dependsOn: [ unzipExamples, testClasses ]) << {
     runner.run(new File(examplesDir, "metrics-examples"), typingsDir, null, null)
     runner.run(new File(examplesDir, "mongo-examples"), typingsDir, null, null)
     runner.run(new File(examplesDir, "redis-examples"), typingsDir, null, null)
+    runner.run(new File(examplesDir, "shell-examples"), typingsDir, null, null)
     runner.run(new File(examplesDir, "web-examples"), typingsDir, null, null)
 }
 

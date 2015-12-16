@@ -23,6 +23,18 @@
 @comment{"======================================"}
 
 @code{
+  def genSimpleName(type) {
+    return genSimpleNameFromName(type, type.raw.simpleName);
+  }
+  
+  def genSimpleNameFromName(type, simpleName) {
+    if (type.raw.moduleName != null && type.raw.moduleName.equals("vertx-shell") &&
+        simpleName.equals("Session")) {
+      return "ShellSession";
+    }
+    return simpleName;
+  }
+  
   def genTSType(type) {
     if (type.kind == CLASS_STRING) {
       return 'string';
@@ -43,7 +55,7 @@
     } else if (type.kind == CLASS_ENUM) {
       return 'any';
     } else if (type.kind == CLASS_API) {
-      return type.raw.simpleName;
+      return genSimpleName(type);
     } else if (type.kind.collection) {
       return 'Array<' + genTSType(type.args[0]) + '>';
     } else if (type.kind == CLASS_MAP) {
@@ -59,7 +71,7 @@
     } else if (type.name.equals('void') || type.kind == CLASS_VOID) {
       return 'void';
     } else {
-      return type.raw.simpleName;
+      return genSimpleName(type);
     }
   }
 }
@@ -94,14 +106,14 @@
 @end{}
 
 declare module "@{type.raw.moduleName}-js/@{helper.convertCamelCaseToUnderscores(type.raw.simpleName)}" {
-  export = @{ifaceSimpleName};
+  export = @{genSimpleNameFromName(type, ifaceSimpleName)};
 }
 
 @if{doc != null}
 /**
 @{renderDocToHtml(" *", doc, renderLinkToHtml)}
  */@end{}
-interface @{ifaceSimpleName}
+interface @{genSimpleNameFromName(type, ifaceSimpleName)}
 
 @if{concreteSuperType != null}
   extends @{genTSType(concreteSuperType)}
@@ -138,7 +150,7 @@ interface @{ifaceSimpleName}
   @if{method.staticMethod}@code{hasStaticMethods = true}@end{}
 @end{}
 
-declare var @{ifaceSimpleName}: {
+declare var @{genSimpleNameFromName(type, ifaceSimpleName)}: {
   new(): @{ifaceSimpleName};
 @if{hasStaticMethods}
 @foreach{method:methods}
