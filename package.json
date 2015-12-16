@@ -1,11 +1,11 @@
 {
   "name": "vertx-lang-typescript",
-  "version": "3.0.0-SNAPSHOT",
-  "description": "Vert.x 3.0 TypeScript Language Support",
+  "version": "1.0.0",
+  "description": "Vert.x 3 TypeScript Language Support",
   "author": "Michel Kraemer",
   "license": "EPL-1.0",
   "private": true,
   "dependencies": {
-    "typescript": "~1.6.2"
+    "typescript": "~1.7.5"
   }
 }
