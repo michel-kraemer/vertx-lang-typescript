@@ -1,6 +1,6 @@
 {
   "name": "vertx-lang-typescript",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Vert.x 3 TypeScript Language Support",
   "author": "Michel Kraemer",
   "license": "EPL-1.0",

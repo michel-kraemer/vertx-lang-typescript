@@ -1,7 +1,7 @@
-TypeScript for Vert.x 3.1 (or higher)
+TypeScript for Vert.x 3.2 (or higher)
 =====================================
 
-This library adds TypeScript 1.6 support to [Vert.x 3.1](http://vertx.io) or higher.
+This library adds TypeScript 1.7 support to [Vert.x 3.2](http://vertx.io) or higher.
 
 Usage
 -----
@@ -11,7 +11,7 @@ add the library to your class path and you're done**. Files with a name ending
 in `.ts` will automatically be compiled to JavaScript when they are executed.
 
 [Type definitions](https://github.com/michel-kraemer/vertx-lang-typescript/releases/)
-for the Vert.x JavaScript API are also provided (`vertx-lang-typescript-1.0.0-typings.zip`). Use them in your
+for the Vert.x JavaScript API are also provided (`vertx-lang-typescript-1.1.0-typings.zip`). Use them in your
 favourite TypeScript editor to get **auto-completion**, **API documentation** and
 **meaningful error messages**.
 
@@ -19,7 +19,7 @@ favourite TypeScript editor to get **auto-completion**, **API documentation** an
 
 ### Add to local Vert.x installation
 
-[Download the library's main jar](https://github.com/michel-kraemer/vertx-lang-typescript/releases/) (`vertx-lang-typescript-1.0.0.jar`)
+[Download the library's main jar](https://github.com/michel-kraemer/vertx-lang-typescript/releases/) (`vertx-lang-typescript-1.1.0.jar`)
 and put it into the `lib` folder of your local Vert.x installation. It will be automatically
 added to the classpath by the Vert.x start script.
 
@@ -32,7 +32,7 @@ If your application's build is based on **Maven** add the following lines to you
 <dependency>
     <groupId>de.undercouch</groupId>
     <artifactId>vertx-lang-typescript</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
@@ -40,7 +40,7 @@ If you use **Gradle** add the following to your `build.gradle`:
 
 ```gradle
 dependencies {
-    compile 'de.undercouch:vertx-lang-typescript:1.0.0'
+    compile 'de.undercouch:vertx-lang-typescript:1.1.0'
 }
 ```
 
@@ -132,6 +132,13 @@ Perform a full build with
 ```
 
 Just as Vert.x 3.x the library requires Java 8.
+
+Older Vert.x versions
+---------------------
+
+vertx-lang-typescript can be used from Vert.x 3.1 upwards. Go to the
+[releases page](https://github.com/michel-kraemer/vertx-lang-typescript/releases)
+and download the version that fits your Vert.x release.
 
 License
 -------
