@@ -44,7 +44,7 @@ function compileTypescript(file, sourceFactory) {
     },
 
     getNewLine: function() {
-      return java.lang.System.lineSeparator();
+      return __lineSeparator;
     },
 
     getSourceFile: function(filename, languageVersion, onError) {
@@ -54,7 +54,7 @@ function compileTypescript(file, sourceFactory) {
         var input = sourceFactory.getSource(filename, file);
         body = input.toString();
       } catch (e) {
-        if (e instanceof java.io.FileNotFoundException) {
+        if (__isFileNotFoundException(e)) {
           // the original version of this method just returns 'undefined'
           // if it could not find a file
           return undefined;
@@ -93,7 +93,7 @@ function compileTypescript(file, sourceFactory) {
     }
     var category = ts.DiagnosticCategory[diagnostic.category].toLowerCase();
     output += category + " TS" + diagnostic.code + ": " + ts.flattenDiagnosticMessageText(diagnostic.messageText, host.getNewLine()) + host.getNewLine();
-    java.lang.System.err.println(output);
+    __printlnErr(output);
   }
 
   function reportDiagnostics(diagnostics) {

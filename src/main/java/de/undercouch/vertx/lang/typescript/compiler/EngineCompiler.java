@@ -14,9 +14,11 @@
 
 package de.undercouch.vertx.lang.typescript.compiler;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.script.ScriptEngine;
@@ -92,6 +94,12 @@ public class EngineCompiler implements TypeScriptCompiler {
     
     // load compile.js
     loadScript(COMPILE_JS, null);
+    
+    // define some globals
+    engine.put("__lineSeparator", System.lineSeparator());
+    engine.put("__isFileNotFoundException", (Function<Object, Boolean>)(e ->
+        e instanceof FileNotFoundException));
+    engine.put("__printlnErr", (Consumer<Object>)System.err::println);
     
     return engine;
   }
