@@ -33,6 +33,7 @@ import de.undercouch.vertx.lang.typescript.compiler.NodeCompiler;
 import de.undercouch.vertx.lang.typescript.compiler.Source;
 import de.undercouch.vertx.lang.typescript.compiler.SourceFactory;
 import de.undercouch.vertx.lang.typescript.compiler.TypeScriptCompiler;
+import de.undercouch.vertx.lang.typescript.compiler.V8Compiler;
 
 /**
  * Test if all JavaScript examples from vertx-examples can be compiled
@@ -77,6 +78,7 @@ public class TestExamplesRunner {
   
   private TypeScriptCompiler nodeCompiler;
   private TypeScriptCompiler engineCompiler;
+  private TypeScriptCompiler v8Compiler;
   
   private TypeScriptCompiler getNodeCompiler() {
     if (nodeCompiler == null) {
@@ -90,6 +92,13 @@ public class TestExamplesRunner {
       engineCompiler = new EngineCompiler();
     }
     return engineCompiler;
+  }
+  
+  private TypeScriptCompiler getV8Compiler() {
+    if (v8Compiler == null) {
+      v8Compiler = new V8Compiler();
+    }
+    return v8Compiler;
   }
   
   private boolean containsEndsWith(Set<String> haystack, String needle) {
@@ -179,6 +188,12 @@ public class TestExamplesRunner {
     
     List<File> javaScriptFiles = getAllJavaScriptFiles(pathToExamples);
     TypeScriptCompiler compiler;
+    
+    if (V8Compiler.supportsV8()) {
+      System.out.println("Using V8Compiler ...");
+      compiler = getV8Compiler();
+      run(javaScriptFiles, compiler, pathToExamples, pathToTypings);
+    }
     
     if (NodeCompiler.supportsNode()) {
       System.out.println("Using NodeCompiler ...");
