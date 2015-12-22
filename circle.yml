@@ -20,5 +20,5 @@ dependencies:
     - echo $JAVA_HOME
 test:
   override:
-    - export TERM=dumb ./gradlew test:
+    - (./gradlew test):
         timeout: 1200
