@@ -62,12 +62,26 @@ Improve performance
 
 The TypeScript compiler runs rather slow in the JVM using the Nashorn JavaScript
 engine. It takes a couple of cycles before the compiler reaches its full speed.
-For this reason, the library offers a number of parameters to tweak the
-performance.
+You have a number of options to improve and tweak the performance.
+
+### Use V8 runtime
+
+The fastest option is to use the V8 JavaScript engine to execute the
+TypeScript compiler. If [J2V8 3.1.1](https://github.com/eclipsesource/j2v8) is
+available in the classpath the library automatically makes use of it.
+
+If you execute your Vert.x application on the command line using the `vertx`
+command then just put the right J2V8 jar for your operating system and
+architecture (e.g. `j2v8_linux_x86_64-3.1.1.jar` for Linux or
+`j2v8_win32_x86_64-3.1.1.jar` for Windows) into the `lib` folder of your local
+Vert.x installation.
+
+Otherwise follow the instructions on the [J2V8](https://github.com/eclipsesource/j2v8)
+site to add the right library to your classpath.
 
 ### Make use of Node.js
 
-The TypeScript compiler runs a lot faster in [Node.js](https://nodejs.org/).
+The TypeScript compiler runs very fast in [Node.js](https://nodejs.org/).
 If the `node` executable is in the path the library automatically makes use of it.
 
 ### Cache compiled scripts in memory
