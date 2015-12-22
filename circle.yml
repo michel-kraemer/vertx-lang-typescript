@@ -20,5 +20,5 @@ dependencies:
     - echo $JAVA_HOME
 test:
   override:
-    - (./gradlew test):
+    - gradle test:
         timeout: 1200
