@@ -17,7 +17,7 @@ apply plugin: 'signing'
 import de.undercouch.gradle.tasks.download.Download
 import org.apache.commons.lang3.SystemUtils
 
-version = '1.1.0'
+version = '1.2.0-SNAPSHOT'
 group = 'de.undercouch'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
