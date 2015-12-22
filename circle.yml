@@ -18,7 +18,3 @@ dependencies:
     - sudo update-java-alternatives -s java-8-oracle
     - javac -version
     - echo $JAVA_HOME
-test:
-  override:
-    - gradle test:
-        timeout: 1200
