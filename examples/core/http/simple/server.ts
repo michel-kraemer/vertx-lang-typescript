@@ -1,4 +1,4 @@
-/// <reference path="vertx-js/vertx.d.ts" />
+/// <reference path="../../../../build/typings/vertx-js/vertx.d.ts" />
 
 vertx.createHttpServer().requestHandler(req => {
   req.response().putHeader("Content-type", "text/html")
