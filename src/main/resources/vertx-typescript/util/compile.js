@@ -60,7 +60,7 @@ function compileTypescript(file, sourceFactory) {
           return undefined;
         }
         if (onError) {
-          onError(e.getMessage() || "Unknown error");
+          onError((e.getMessage && e.getMessage()) || "Unknown error");
         }
         body = "";
       }
