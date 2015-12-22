@@ -64,7 +64,7 @@ The TypeScript compiler runs rather slow in the JVM using the Nashorn JavaScript
 engine. It takes a couple of cycles before the compiler reaches its full speed.
 You have a number of options to improve and tweak the performance.
 
-### Use V8 runtime
+### Use V8 runtime (feature only available in 1.2.0-SNAPSHOT)
 
 The fastest option is to use the V8 JavaScript engine to execute the
 TypeScript compiler. If [J2V8 3.1.1](https://github.com/eclipsesource/j2v8) is
