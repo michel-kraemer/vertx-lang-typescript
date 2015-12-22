@@ -36,12 +36,12 @@ public class EngineCompiler implements TypeScriptCompiler {
   /**
    * Path to the TypeScript compiler
    */
-  private static final String TYPESCRIPT_JS = "typescript/lib/typescriptServices.js";
+  static final String TYPESCRIPT_JS = "typescript/lib/typescriptServices.js";
   
   /**
    * Path to a helper script calling the TypeScript compiler
    */
-  private static final String COMPILE_JS = "vertx-typescript/util/compile.js";
+  static final String COMPILE_JS = "vertx-typescript/util/compile.js";
   
   /**
    * The JavaScript engine hosting the TypeScript compiler
