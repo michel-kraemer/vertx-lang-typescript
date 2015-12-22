@@ -1,3 +1,9 @@
+buildscript {
+  dependencies {
+    classpath 'org.apache.commons:commons-lang3:3.4'
+  }
+}
+
 plugins {
     id 'com.moowork.node' version '0.11'
     id 'de.undercouch.download' version '2.0.0'
@@ -9,6 +15,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 import de.undercouch.gradle.tasks.download.Download
+import org.apache.commons.lang3.SystemUtils
 
 version = '1.1.0'
 group = 'de.undercouch'
@@ -28,13 +35,39 @@ repositories {
 }
 
 configurations {
+    provided
     vertx
     codegen
+}
+
+def getV8Dependency() {
+  def arch = System.getProperty('os.arch')
+  def dep = null
+  if (SystemUtils.IS_OS_WINDOWS) {
+    dep = 'win32_x86'
+    if (arch.equals('amd64')) {
+      dep += '_64'
+    }
+  } else if (SystemUtils.IS_OS_MAC && arch.equals('amd64')) {
+    dep = 'macosx_x86_64'
+  } else if (SystemUtils.IS_OS_LINUX && arch.equals('amd64')) {
+    dep = 'linux_x86_64'
+  }
+  if (dep == null) {
+    logger.error("Could not find V8 runtime compatible to this system")
+    return null
+  }
+  return 'com.eclipsesource.j2v8:j2v8_' + dep + ':3.1.6'
 }
 
 dependencies {
     compile "io.vertx:vertx-core:$vertxVersion"
     compile "io.vertx:vertx-lang-js:$vertxVersion"
+    
+    // compile-time dependencies
+    if (getV8Dependency() != null) {
+      provided getV8Dependency()
+    }
 
     testCompile 'junit:junit:4.12'
     testCompile "io.vertx:vertx-web:$vertxVersion"
@@ -86,6 +119,11 @@ dependencies {
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.9'
+}
+
+// add 'provided' configuration to javadoc classpath
+javadoc {
+  classpath += configurations.provided
 }
 
 // package javadoc into a jar file
@@ -164,6 +202,9 @@ sourceSets {
         resources {
             srcDir 'src-gen/main/resources'
         }
+        
+        // add 'provided' configuration to compile classpath
+        compileClasspath += configurations.provided
     }
 }
 
@@ -244,6 +285,13 @@ processResources.dependsOn(copyRequiredResources)
 
 eclipseClasspath.dependsOn(processResources)
 
+// add 'provided' to eclipse classpath
+eclipse {
+  classpath {
+    plusConfigurations += [configurations.provided]
+  }
+}
+
 assemble.dependsOn(typeDefinitionsZip)
 
 task downloadExamples(type: Download) {
@@ -258,8 +306,8 @@ task unzipExamples(dependsOn: downloadExamples, type: Copy) {
 }
 
 task testExamples(dependsOn: [ unzipExamples, testClasses ]) << {
-    def cp = project.test.classpath
-    def urls = cp.files.collect { it.toURI().toURL() }
+    def cp = project.test.classpath + configurations.provided
+    def urls = cp.collect { it.toURI().toURL() }
     def cl = new URLClassLoader(urls.toArray(new URL[urls.size()]))
     def cls = cl.loadClass("de.undercouch.vertx.lang.typescript.TestExamplesRunner")
     def runner = cls.newInstance()
