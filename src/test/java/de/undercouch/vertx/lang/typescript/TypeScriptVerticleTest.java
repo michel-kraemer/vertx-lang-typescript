@@ -15,6 +15,7 @@
 package de.undercouch.vertx.lang.typescript;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +28,14 @@ import org.junit.runners.Parameterized;
 
 import de.undercouch.vertx.lang.typescript.compiler.NodeCompiler;
 import de.undercouch.vertx.lang.typescript.compiler.V8Compiler;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpClient;
+import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -108,6 +115,21 @@ public class TypeScriptVerticleTest {
     }
   }
   
+  private void makeRequest(HttpClient client, int port, int retries, int delay,
+      Handler<AsyncResult<Buffer>> handler) {
+    Vertx vertx = runTestOnContext.vertx();
+    HttpClientRequest request = client.get(port, "localhost", "/", response ->
+      response.bodyHandler(buffer -> handler.handle(Future.succeededFuture(buffer))));
+    request.exceptionHandler(t -> {
+      if (retries > 0 && t instanceof ConnectException) {
+        vertx.setTimer(delay, l -> makeRequest(client, port, retries - 1, delay, handler));
+      } else {
+        handler.handle(Future.failedFuture(t));
+      }
+    });
+    request.end();
+  }
+  
   private void doTest(String verticle, String message, TestContext context) throws IOException {
     Async async = context.async();
     int port = getAvailablePort();
@@ -115,12 +137,13 @@ public class TypeScriptVerticleTest {
     DeploymentOptions options = new DeploymentOptions().setConfig(config);
     Vertx vertx = runTestOnContext.vertx();
     vertx.deployVerticle(verticle, options, context.asyncAssertSuccess(deploymentID -> {
-      vertx.createHttpClient().getNow(port, "localhost", "/", response -> {
-        response.bodyHandler(buffer -> {
-          context.assertEquals(message, buffer.toString());
-          vertx.undeploy(deploymentID, context.asyncAssertSuccess(r -> async.complete()));
-        });
-      });
+      HttpClient client = vertx.createHttpClient();
+      // retry for 30 seconds and give the verticle a chance to launch the server
+      makeRequest(client, port, 30, 1000, context.asyncAssertSuccess(buffer -> {
+        context.assertEquals(message, buffer.toString());
+        vertx.undeploy(deploymentID, context.asyncAssertSuccess(r -> async.complete()));
+        client.close();
+      }));
     }));
   }
   
