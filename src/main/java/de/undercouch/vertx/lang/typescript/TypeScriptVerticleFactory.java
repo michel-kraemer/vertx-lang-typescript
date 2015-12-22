@@ -31,6 +31,7 @@ import de.undercouch.vertx.lang.typescript.cache.NoopCache;
 import de.undercouch.vertx.lang.typescript.compiler.EngineCompiler;
 import de.undercouch.vertx.lang.typescript.compiler.NodeCompiler;
 import de.undercouch.vertx.lang.typescript.compiler.TypeScriptCompiler;
+import de.undercouch.vertx.lang.typescript.compiler.V8Compiler;
 
 /**
  * A factory for verticles written in TypeScript
@@ -49,6 +50,12 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
   public static final String PROP_NAME_CACHE_DIR = "vertx.typescriptCacheDir";
   
   /**
+   * The name of the system property specifying that the V8 compiler
+   * should not be used even if the V8 runtime is available.
+   */
+  public static final String PROP_NAME_DISABLE_V8_COMPILER = "vertx.disableV8Compiler";
+  
+  /**
    * The name of the system property specifying that the Node.js compiler
    * should not be used even if Node.js is available.
    */
@@ -56,7 +63,8 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
   
   /**
    * The name of the system property specifying that multiple instances of the
-   * factory should share the same TypeScript compiler.
+   * factory should share the same TypeScript compiler (not available for the
+   * V8 compiler)
    */
   public static final String PROP_NAME_SHARE_COMPILER = "vertx.typescriptShareCompiler";
   
@@ -155,39 +163,41 @@ public class TypeScriptVerticleFactory implements VerticleFactory {
     return new TypeScriptVerticle(v);
   }
   
+  private <T extends TypeScriptCompiler> T makeTypeScriptCompiler(Class<T> compilerClass,
+      AtomicReference<T> sharedCompiler) throws ReflectiveOperationException {
+    if (sharedCompiler != null) {
+      T nc = sharedCompiler.get();
+      if (nc == null) {
+        nc = compilerClass.newInstance();
+        if (!sharedCompiler.compareAndSet(null, nc)) {
+          nc = sharedCompiler.get();
+        }
+      }
+      return nc;
+    }
+    return compilerClass.newInstance();
+  }
+  
   /**
    * @return the best available TypeScript compiler
    */
   private TypeScriptCompiler getTypeScriptCompiler() {
+    boolean disableV8Compiler = Boolean.getBoolean(PROP_NAME_DISABLE_V8_COMPILER);
     boolean disableNodeCompiler = Boolean.getBoolean(PROP_NAME_DISABLE_NODE_COMPILER);
     if (compiler == null) {
       boolean share = Boolean.getBoolean(PROP_NAME_SHARE_COMPILER);
-      if (!disableNodeCompiler && NodeCompiler.supportsNode()) {
-        if (share) {
-          NodeCompiler nc = sharedNodeCompiler.get();
-          if (nc == null) {
-            nc = new NodeCompiler();
-            if (!sharedNodeCompiler.compareAndSet(null, nc)) {
-              nc = sharedNodeCompiler.get();
-            }
-          }
-          compiler = nc;
+      try {
+        if (!disableV8Compiler && V8Compiler.supportsV8()) {
+          compiler = makeTypeScriptCompiler(V8Compiler.class, null);
+        } else if (!disableNodeCompiler && NodeCompiler.supportsNode()) {
+          compiler = makeTypeScriptCompiler(NodeCompiler.class,
+              share ? sharedNodeCompiler : null);
         } else {
-          compiler = new NodeCompiler();
+          compiler = makeTypeScriptCompiler(EngineCompiler.class,
+              share ? sharedEngineCompiler : null);
         }
-      } else {
-        if (share) {
-          EngineCompiler ec = sharedEngineCompiler.get();
-          if (ec == null) {
-            ec = new EngineCompiler();
-            if (!sharedEngineCompiler.compareAndSet(null, ec)) {
-              ec = sharedEngineCompiler.get();
-            }
-          }
-          compiler = ec;
-        } else {
-          compiler = new EngineCompiler();
-        }
+      } catch (ReflectiveOperationException e) {
+        throw new RuntimeException("Could not create TypeScript compiler", e);
       }
     }
     return compiler;
