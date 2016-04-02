@@ -44,6 +44,9 @@
     host.getDefaultLibFileName = function(options) {
       return "typescript/lib/" + (options.target === 2 ? "lib.core.es6.d.ts" : "lib.core.d.ts");
     };
+    host.getCurrentDirectory = function() {
+      return "";
+    };
     host.fileExists = function(path) {
       // send tag and filename to parent process
       doWriteSync(process.stdout.fd, "VERTX_TYPESCRIPT_FILEEXISTS" + path + "\n");
