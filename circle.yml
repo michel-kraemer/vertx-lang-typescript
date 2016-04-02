@@ -18,3 +18,7 @@ dependencies:
     - sudo update-java-alternatives -s java-8-oracle
     - javac -version
     - echo $JAVA_HOME
+test:
+  post:
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
+    - find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
