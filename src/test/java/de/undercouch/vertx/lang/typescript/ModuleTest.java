@@ -14,15 +14,12 @@
 
 package de.undercouch.vertx.lang.typescript;
 
-import java.util.Arrays;
-
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import de.undercouch.vertx.lang.typescript.compiler.NodeCompiler;
 import io.vertx.core.Vertx;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -35,7 +32,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunnerWithParametersFactory;
  */
 @RunWith(Parameterized.class)
 @Parameterized.UseParametersRunnerFactory(VertxUnitRunnerWithParametersFactory.class)
-public class ModuleTest {
+public class ModuleTest extends MultipleCompilerTestBase {
   @Rule
   public RunTestOnContext runTestOnContext = new RunTestOnContext();
   
@@ -44,22 +41,8 @@ public class ModuleTest {
     System.setProperty(TypeScriptVerticleFactory.PROP_NAME_SHARE_COMPILER, "true");
   }
   
-  @Parameterized.Parameters
-  public static Iterable<Boolean> useNodeCompiler() {
-    if (NodeCompiler.supportsNode()) {
-      // skip EngineCompiler tests on Circle CI, because they are likely to time out
-      if (System.getenv("CIRCLE_BUILD_NUM") != null) {
-        return Arrays.asList(true);
-      }
-      return Arrays.asList(true, false);
-    } else {
-      return Arrays.asList(false);
-    }
-  }
-  
-  public ModuleTest(boolean useNodeCompiler) {
-    System.setProperty(TypeScriptVerticleFactory.PROP_NAME_DISABLE_NODE_COMPILER,
-        String.valueOf(!useNodeCompiler));
+  public ModuleTest(Compiler compiler) {
+    super(compiler);
   }
   
   /**

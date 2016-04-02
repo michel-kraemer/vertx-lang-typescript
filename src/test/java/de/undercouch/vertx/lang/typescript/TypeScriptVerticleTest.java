@@ -17,8 +17,6 @@ package de.undercouch.vertx.lang.typescript;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -26,8 +24,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import de.undercouch.vertx.lang.typescript.compiler.NodeCompiler;
-import de.undercouch.vertx.lang.typescript.compiler.V8Compiler;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
@@ -49,13 +45,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunnerWithParametersFactory;
  */
 @RunWith(Parameterized.class)
 @Parameterized.UseParametersRunnerFactory(VertxUnitRunnerWithParametersFactory.class)
-public class TypeScriptVerticleTest {
-  private static enum Compiler {
-    V8,
-    NODE,
-    ENGINE
-  }
-  
+public class TypeScriptVerticleTest extends MultipleCompilerTestBase {
   @Rule
   public RunTestOnContext runTestOnContext = new RunTestOnContext();
 
@@ -67,35 +57,8 @@ public class TypeScriptVerticleTest {
     System.setProperty(TypeScriptVerticleFactory.PROP_NAME_SHARE_COMPILER, "true");
   }
   
-  @Parameterized.Parameters
-  public static Iterable<Compiler> useNodeCompiler() {
-    List<Compiler> result = new ArrayList<>();
-    if (V8Compiler.supportsV8()) {
-      result.add(Compiler.V8);
-    }
-    if (NodeCompiler.supportsNode()) {
-      result.add(Compiler.NODE);
-    }
-    // skip EngineCompiler tests on Circle CI, because they are likely to time out
-    if (System.getenv("CIRCLE_BUILD_NUM") == null) {
-      result.add(Compiler.ENGINE);
-    }
-    return result;
-  }
-  
   public TypeScriptVerticleTest(Compiler compiler) {
-    switch (compiler) {
-    case V8:
-      // nothing to do here. V8 is the one with the highest priority
-      break;
-    case NODE:
-      System.setProperty(TypeScriptVerticleFactory.PROP_NAME_DISABLE_V8_COMPILER, "true");
-      break;
-    case ENGINE:
-      System.setProperty(TypeScriptVerticleFactory.PROP_NAME_DISABLE_V8_COMPILER, "true");
-      System.setProperty(TypeScriptVerticleFactory.PROP_NAME_DISABLE_NODE_COMPILER, "true");
-      break;
-    }
+    super(compiler);
   }
   
   /**
