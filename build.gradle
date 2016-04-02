@@ -5,8 +5,8 @@ buildscript {
 }
 
 plugins {
-    id 'com.moowork.node' version '0.11'
-    id 'de.undercouch.download' version '2.0.0'
+    id 'com.moowork.node' version '0.12'
+    id 'de.undercouch.download' version '2.1.0'
 }
 
 apply plugin: 'java'
@@ -192,8 +192,8 @@ uploadArchives {
 }
 
 node {
-    version = '5.2.0'
-    npmVersion = '3.3.12'
+    version = '5.10.0'
+    npmVersion = '3.8.6'
     download = true
 }
 
