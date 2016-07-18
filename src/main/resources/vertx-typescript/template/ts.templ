@@ -28,7 +28,7 @@
   def genSimpleName(type) {
     return genSimpleNameFromName(type, type.raw.simpleName);
   }
-  
+
   def genSimpleNameFromName(type, simpleName) {
     if (type.raw.moduleName != null && type.raw.moduleName.equals("vertx-shell") &&
         simpleName.equals("Session")) {
@@ -36,7 +36,7 @@
     }
     return simpleName;
   }
-  
+
   def genTSType(type) {
     if (type.kind == CLASS_STRING) {
       return 'string';
@@ -81,7 +81,7 @@
 @comment{"Generate a method"}
 @comment{"================="}
 
-@declare{'genMethod'} 
+@declare{'genMethod'}
   @if{method.staticMethod == static}
   @if{method.doc != null}
   /**
@@ -108,59 +108,60 @@
 @end{}
 
 declare module "@{type.raw.moduleName}-js/@{helper.convertCamelCaseToUnderscores(type.raw.simpleName)}" {
-  export = @{genSimpleNameFromName(type, ifaceSimpleName)};
-}
 
-@if{doc != null}
-/**
-@{renderDocToHtml(" *", doc, renderLinkToHtml)}
- */@end{}
-interface @{genSimpleNameFromName(type, ifaceSimpleName)}
 
-@if{concreteSuperType != null}
-  extends @{genTSType(concreteSuperType)}
-@end{}
+  @if{doc != null}
+  /**
+  @{renderDocToHtml(" *", doc, renderLinkToHtml)}
+   */@end{}
+  export interface @{genSimpleNameFromName(type, ifaceSimpleName)}
 
-@if{abstractSuperTypes.size() > 0}
-  extends
-  @foreach{abstractSuperType: abstractSuperTypes}
-    @{genTSType(abstractSuperType)}
-  @end{', '}
-@end{}
+  @if{concreteSuperType != null}
+    extends @{genTSType(concreteSuperType)}
+  @end{}
 
-@comment{"TODO handle this!!"}
-@comment{
-@if{handlerSuperType != null}
-  @if{abstractSuperTypes.empty}
+  @if{abstractSuperTypes.size() > 0}
     extends
-  @else{}
-    ,
+    @foreach{abstractSuperType: abstractSuperTypes}
+      @{genTSType(abstractSuperType)}
+    @end{', '}
   @end{}
-  Handler
-@end{}
-}
 
-{
+  @comment{"TODO handle this!!"}
+  @comment{
+  @if{handlerSuperType != null}
+    @if{abstractSuperTypes.empty}
+      extends
+    @else{}
+      ,
+    @end{}
+    Handler
+  @end{}
+  }
+
+  {
+    @foreach{method:methods}
+      @includeNamed{'genMethod';static=false}
+    @end{}
+  }
+
+  @comment{"Check if there are static methods"}
+  @code{hasStaticMethods = false}
   @foreach{method:methods}
-    @includeNamed{'genMethod';static=false}
+    @if{method.staticMethod}@code{hasStaticMethods = true}@end{}
   @end{}
+
+  export var @{genSimpleNameFromName(type, ifaceSimpleName)}: {
+  @if{hasStaticMethods}
+  @foreach{method:methods}
+    @includeNamed{'genMethod';static=true}
+  @end{}
+  @end{}
+  }
+
+  @if{ifaceSimpleName == 'Vertx'}
+  export var vertx: Vertx;
+  export var console: Console;
+  @end{}
+
 }
-
-@comment{"Check if there are static methods"}
-@code{hasStaticMethods = false}
-@foreach{method:methods}
-  @if{method.staticMethod}@code{hasStaticMethods = true}@end{}
-@end{}
-
-declare var @{genSimpleNameFromName(type, ifaceSimpleName)}: {
-@if{hasStaticMethods}
-@foreach{method:methods}
-  @includeNamed{'genMethod';static=true}
-@end{}
-@end{}
-}
-
-@if{ifaceSimpleName == 'Vertx'}
-declare var vertx: Vertx;
-declare var console: Console;
-@end{}
