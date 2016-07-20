@@ -10,16 +10,17 @@
 @comment{"=================================="}
 
 @code{
-  def genModuleName(moduleType) {
+  def genModulePath(moduleType) {
     String sn = helper.convertCamelCaseToUnderscores(moduleType.raw.simpleName);
     if (!type.raw.moduleName.equals(moduleType.raw.moduleName)) {
       sn = "../" + moduleType.raw.moduleName + "-js/" + sn;
     } else {
       sn = "./" + sn;
     }
-    return sn + '.d.ts';
+    return sn;
   }
 }
+
 
 @comment{"Generate the TypeScript type of a type"}
 @comment{"======================================"}
@@ -28,7 +29,7 @@
   def genSimpleName(type) {
     return genSimpleNameFromName(type, type.raw.simpleName);
   }
-  
+
   def genSimpleNameFromName(type, simpleName) {
     if (type.raw.moduleName != null && type.raw.moduleName.equals("vertx-shell") &&
         simpleName.equals("Session")) {
@@ -36,7 +37,7 @@
     }
     return simpleName;
   }
-  
+
   def genTSType(type) {
     if (type.kind == CLASS_STRING) {
       return 'string';
@@ -76,35 +77,39 @@
       return genSimpleName(type);
     }
   }
+
+  def cleanParamName(name) {
+    if(name == 'arguments'){
+      return 'args';
+    }else{
+      return name;
+    }
+  }
 }
 
 @comment{"Generate a method"}
 @comment{"================="}
 
-@declare{'genMethod'} 
+@declare{'genMethod'}
   @if{method.staticMethod == static}
   @if{method.doc != null}
   /**
   @{renderDocToHtml(" *", method.doc, renderLinkToHtml)}
    */@end{}
-  @{method.name}(@foreach{param: method.params}@{param.name}: @{genTSType(param.type)}@end{", "}): @{genTSType(method.returnType)};
+  @{method.name}(@foreach{param: method.params}@{cleanParamName(param.name)}: @{genTSType(param.type)}@end{", "}): @{genTSType(method.returnType)};
   @end{}
 @end{}
 
+
 @comment{"Generate interface"}
 @comment{"=================="}
-
 @if{type.raw.moduleName.equals("vertx")}
-/// <reference path="./throwable.d.ts" />
+/// <reference path="./globals.d.ts" />
 @else{}
-/// <reference path="../vertx-js/throwable.d.ts" />
-/// <reference path="../vertx-js/vertx.d.ts" />
-@end{}
-@if{ifaceSimpleName == 'Vertx'}
-/// <reference path="./console.d.ts" />
+/// <reference path="../vertx-js/globals.d.ts" />
 @end{}
 @foreach{referencedType : referencedTypes}
-/// <reference path="@{genModuleName(referencedType)}" />
+/// <reference path="@{genModulePath(referencedType)}" />
 @end{}
 
 declare module "@{type.raw.moduleName}-js/@{helper.convertCamelCaseToUnderscores(type.raw.simpleName)}" {
@@ -115,7 +120,7 @@ declare module "@{type.raw.moduleName}-js/@{helper.convertCamelCaseToUnderscores
 /**
 @{renderDocToHtml(" *", doc, renderLinkToHtml)}
  */@end{}
-interface @{genSimpleNameFromName(type, ifaceSimpleName)}
+declare interface @{genSimpleNameFromName(type, ifaceSimpleName)}
 
 @if{concreteSuperType != null}
   extends @{genTSType(concreteSuperType)}
@@ -159,8 +164,3 @@ declare var @{genSimpleNameFromName(type, ifaceSimpleName)}: {
 @end{}
 @end{}
 }
-
-@if{ifaceSimpleName == 'Vertx'}
-declare var vertx: Vertx;
-declare var console: Console;
-@end{}
