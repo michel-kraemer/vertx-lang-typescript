@@ -91,46 +91,46 @@
 @comment{"================="}
 
 @declare{'genMethod'}
-  @if{method.staticMethod == static}
-  @if{method.doc != null}
-  /**
-  @{renderDocToHtml(" *", method.doc, renderLinkToHtml)}
-   */@end{}
-  @{method.name}(@foreach{param: method.params}@{cleanParamName(param.name)}: @{genTSType(param.type)}@end{", "}): @{genTSType(method.returnType)};
-  @end{}
+@if{method.staticMethod == static}
+@if{method.doc != null}  /**\n
+@{renderDocToHtml("   *", method.doc, renderLinkToHtml)}
+   */\n@end{}
+  @{method.name}(@foreach{param: method.params}@{cleanParamName(param.name)}: @{genTSType(param.type)}@end{", "}): @{genTSType(method.returnType)};\n\n
+@end{}
 @end{}
 
 
 @comment{"Generate interface"}
 @comment{"=================="}
 @if{type.raw.moduleName.equals("vertx")}
-/// <reference path="./globals.d.ts" />
+/// <reference path="./globals.d.ts" />\n
 @else{}
-/// <reference path="../vertx-js/globals.d.ts" />
+/// <reference path="../vertx-js/globals.d.ts" />\n
 @end{}
 @foreach{referencedType : referencedTypes}
-/// <reference path="@{genModulePath(referencedType)}" />
+/// <reference path="@{genModulePath(referencedType)}" />\n
 @end{}
+\n
 
-declare module "@{type.raw.moduleName}-js/@{helper.convertCamelCaseToUnderscores(type.raw.simpleName)}" {
-  export = @{genSimpleNameFromName(type, ifaceSimpleName)};
-}
+declare module "@{type.raw.moduleName}-js/@{helper.convertCamelCaseToUnderscores(type.raw.simpleName)}" {\n
+  export = @{genSimpleNameFromName(type, ifaceSimpleName)};\n
+}\n
 
 @if{doc != null}
-/**
+\n/**\n
 @{renderDocToHtml(" *", doc, renderLinkToHtml)}
  */@end{}
-declare interface @{genSimpleNameFromName(type, ifaceSimpleName)}
+\ndeclare interface @{genSimpleNameFromName(type, ifaceSimpleName)}
 
 @if{concreteSuperType != null}
-  extends @{genTSType(concreteSuperType)}
+ extends @{genTSType(concreteSuperType)}
 @end{}
 
 @if{abstractSuperTypes.size() > 0}
-  extends
-  @foreach{abstractSuperType: abstractSuperTypes}
-    @{genTSType(abstractSuperType)}
-  @end{', '}
+ extends
+@foreach{abstractSuperType: abstractSuperTypes}
+ @{genTSType(abstractSuperType)}
+@end{','}
 @end{}
 
 @comment{"TODO handle this!!"}
@@ -145,22 +145,24 @@ declare interface @{genSimpleNameFromName(type, ifaceSimpleName)}
 @end{}
 }
 
-{
-  @foreach{method:methods}
-    @includeNamed{'genMethod';static=false}
-  @end{}
-}
+ {\n\n
+@foreach{method:methods}
+@includeNamed{'genMethod';static=false}
+@end{}
+}\n\n
 
 @comment{"Check if there are static methods"}
 @code{hasStaticMethods = false}
 @foreach{method:methods}
-  @if{method.staticMethod}@code{hasStaticMethods = true}@end{}
+@if{method.staticMethod}@code{hasStaticMethods = true}@end{}
 @end{}
 
-declare var @{genSimpleNameFromName(type, ifaceSimpleName)}: {
+declare var @{genSimpleNameFromName(type, ifaceSimpleName)}: {\n\n
+
 @if{hasStaticMethods}
 @foreach{method:methods}
-  @includeNamed{'genMethod';static=true}
+@includeNamed{'genMethod';static=true}
 @end{}
 @end{}
+
 }
