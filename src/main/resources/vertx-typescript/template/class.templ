@@ -52,7 +52,7 @@
     } else if (type.kind == CLASS_JSON_OBJECT) {
       return 'any';
     } else if (type.kind == CLASS_DATA_OBJECT) {
-      return 'any';
+      return type.simpleName;
     } else if (type.kind == CLASS_JSON_ARRAY) {
       return 'any[]';
     } else if (type.kind == CLASS_ENUM) {
