@@ -3,6 +3,9 @@
   "version": "1.1.0",
   "description": "Vert.x 3 TypeScript Language Support",
   "author": "Michel Kraemer",
+  "contributors": [
+    "Daniel Joyce"
+  ],
   "license": "EPL-1.0",
   "private": true,
   "dependencies": {

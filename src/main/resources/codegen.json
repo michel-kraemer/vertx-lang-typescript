@@ -1,5 +1,5 @@
 {
-  "name": "JavaScript",
+  "name": "TypeScript",
   "generators": [ {
     "kind": "class",
     "fileName": "'resources/' + type.raw.moduleName + '-js/' + helper.convertCamelCaseToUnderscores(type.raw.simpleName) + '.d.ts'",

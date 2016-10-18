@@ -44,63 +44,63 @@ public class TestExamplesRunner {
   private static final Set<String> DEFAULT_FILES_TO_SKIP = new HashSet<>();
   static {
     /////// core-examples
-    
+
     // skip node modules
     DEFAULT_DIRS_TO_SKIP.add("node_modules");
-    
+
     // also skip npm examples
     DEFAULT_DIRS_TO_SKIP.add("npm");
-    
+
     // these scripts use 'string.startsWith' which is only available on
     // java.lang.String or with ES6
     DEFAULT_FILES_TO_SKIP.add("simple_form_server.js");
     DEFAULT_FILES_TO_SKIP.add("simple_form_upload_server.js");
-    
+
     /////// web-examples
-    
+
     // skip browser code
     DEFAULT_DIRS_TO_SKIP.add("webroot");
-    
+
     // we don't support the eventbus-client yet
     DEFAULT_DIRS_TO_SKIP.add("vertxbus");
-    
+
     // this example calls RoutingContext.fail() with a Throwable object
     // instead of a status code (number)
     DEFAULT_FILES_TO_SKIP.add("web/custom_authorisation/server.js");
-    
+
     // no valid TypeScript (variable email needs to be of type 'any')
     DEFAULT_FILES_TO_SKIP.add("mail_headers.js");
     DEFAULT_FILES_TO_SKIP.add("mail_login.js");
   }
-  
+
   private Set<String> dirsToSkip;
   private Set<String> filesToSkip;
-  
+
   private TypeScriptCompiler nodeCompiler;
   private TypeScriptCompiler engineCompiler;
   private TypeScriptCompiler v8Compiler;
-  
+
   private TypeScriptCompiler getNodeCompiler() {
     if (nodeCompiler == null) {
       nodeCompiler = new NodeCompiler();
     }
     return nodeCompiler;
   }
-  
+
   private TypeScriptCompiler getEngineCompiler() {
     if (engineCompiler == null) {
       engineCompiler = new EngineCompiler();
     }
     return engineCompiler;
   }
-  
+
   private TypeScriptCompiler getV8Compiler() {
     if (v8Compiler == null) {
       v8Compiler = new V8Compiler();
     }
     return v8Compiler;
   }
-  
+
   private boolean containsEndsWith(Set<String> haystack, String needle) {
     for (String s : haystack) {
       if (needle.endsWith(s)) {
@@ -109,7 +109,7 @@ public class TestExamplesRunner {
     }
     return false;
   }
-  
+
   private void getAllJavaScriptFiles(File dir, List<File> result) {
     File[] files = dir.listFiles();
     for (File f : files) {
@@ -135,7 +135,7 @@ public class TestExamplesRunner {
     getAllJavaScriptFiles(dir, result);
     return result;
   }
-  
+
   private void compile(File script, TypeScriptCompiler compiler,
       SourceFactory parentSourceFactory, File pathToTypings) throws IOException {
     String name = FilenameUtils.separatorsToUnix(script.getPath().replaceFirst("\\.js$", ".ts"));
@@ -145,62 +145,61 @@ public class TestExamplesRunner {
         if (FilenameUtils.equalsNormalized(filename, name)) {
           Source src = Source.fromFile(script, StandardCharsets.UTF_8);
           String srcStr = src.toString();
-          
+
           // find all required vertx modules
           Pattern requireVertx = Pattern.compile("var\\s+.+?=\\s*require\\s*\\(\\s*\"(vertx-.+?)\"\\s*\\)");
           Matcher requireVertxMatcher = requireVertx.matcher(srcStr);
           List<String> modules = new ArrayList<>();
-          modules.add("vertx-js/vertx.d.ts");
-          modules.add("vertx-js/java.d.ts");
+          modules.add("vertx-js/globals.d.ts");
           while (requireVertxMatcher.find()) {
             String mod = requireVertxMatcher.group(1);
             modules.add(mod);
           }
-          
+
           // add default type definitions
           Path relPathToTypings = script.toPath().getParent().relativize(pathToTypings.toPath());
           for (String mod : modules) {
             srcStr = "/// <reference path=\"" + FilenameUtils.separatorsToUnix(
                 relPathToTypings.resolve(mod).toString()) + "\" />\n" + srcStr;
           }
-          
+
           // replace 'var x = require("...")' by 'import x = require("...")'
           srcStr = srcStr.replaceAll("var\\s+(.+?=\\s*require\\s*\\(.+?\\))", "import $1");
-          
+
           return new Source(script.toURI(), srcStr);
         }
         return parentSourceFactory.getSource(filename, baseFilename);
       }
     });
   }
-  
+
   public void run(File pathToExamples, File pathToTypings, List<String> dirsToSkip,
       List<String> filesToSkip) throws Exception {
     this.dirsToSkip = DEFAULT_DIRS_TO_SKIP;
     if (dirsToSkip != null) {
       this.dirsToSkip = new HashSet<>(dirsToSkip);
     }
-    
+
     this.filesToSkip = DEFAULT_FILES_TO_SKIP;
     if (filesToSkip != null) {
       this.filesToSkip = new HashSet<>(filesToSkip);
     }
-    
+
     List<File> javaScriptFiles = getAllJavaScriptFiles(pathToExamples);
     TypeScriptCompiler compiler;
-    
+
     if (V8Compiler.supportsV8()) {
       System.out.println("Using V8Compiler ...");
       compiler = getV8Compiler();
       run(javaScriptFiles, compiler, pathToExamples, pathToTypings);
     }
-    
+
     if (NodeCompiler.supportsNode()) {
       System.out.println("Using NodeCompiler ...");
       compiler = getNodeCompiler();
       run(javaScriptFiles, compiler, pathToExamples, pathToTypings);
     }
-    
+
     // skip EngineCompiler tests on Travis CI, because they are likely to fail
     if (Boolean.parseBoolean(System.getenv("TRAVIS"))) {
       System.out.println("Travis CI environment detected. Skipping EngineCompiler tests.");
@@ -210,16 +209,16 @@ public class TestExamplesRunner {
       run(javaScriptFiles, compiler, pathToExamples, pathToTypings);
     }
   }
-  
+
   private void run(List<File> javaScriptFiles, TypeScriptCompiler compiler,
       File pathToExamples, File pathToTypings) throws Exception {
     SourceFactory parentSourceFactory = new TypeScriptClassLoader(
         getClass().getClassLoader(), compiler, new InMemoryCache());
-    
+
     for (File f : javaScriptFiles) {
       String name = f.getAbsolutePath();
       name = name.substring(pathToExamples.getAbsolutePath().length() + 1);
-      
+
       System.out.print(name + " ... ");
       long start = System.currentTimeMillis();
       try {
@@ -231,7 +230,7 @@ public class TestExamplesRunner {
       System.out.println("OK (" + (System.currentTimeMillis() - start) + " ms)");
     }
   }
-  
+
   public static void main(String[] args) throws Exception {
     TestExamplesRunner runner = new TestExamplesRunner();
     runner.run(new File(args[0]), new File(args[1]), null, null);
